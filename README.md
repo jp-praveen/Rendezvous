@@ -26,7 +26,7 @@ a_target=a_debri+50                                          %in km
 rp_debri=a_debri*(1-e);
 rp_target=a_target*(1-e);
 
-%Assuming both target and chaser are at periapsis at t=0
+%Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory
 
 r1=rp_target;
 r2=rp_debri;
