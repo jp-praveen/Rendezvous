@@ -25,7 +25,7 @@ a_debri=(h_d^2/u)/(1-e^2);                                    % in km
 a_target=a_debri+50;                                          % in km  
 rp_debri=a_debri*(1-e);
 rp_target=a_target*(1-e);
-r1=rp_target;
+r1_cylindrical=rp_target;
 
 %Calculating time period(T) of debri and finding the position at t=T/4
 T=(2*pi*a_debri^(3/2))/u^0.5;
@@ -48,11 +48,33 @@ end
 
 ta_quarter=2*atan(sqrt((1+e)/(1-e))*tan(ea_quarter/2))*180/3.14;    % ta=True Anomaly (in degrees) 
 r_quarter=(h_d^2/u)*(1+e*cos(ta_quarter))^(-1);
-r2=r_quarter;
-
+r2_cylindrical=r_quarter;
 
 % Converting radial vectors to ECI frame
+ta_debri=ta_quarter;
+ta_chaser=0;                                             % True Anomaly of chaser
+r1_cartesian=[r1_cylindrical*cos(ta_chaser);r1_cylindrical*sin(ta_chaser);0];
+r2_cartesian=[r2_cylindrical*cos(ta_debri);r1_cylindrical*sin(ta_debri);0];
 
-%Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory
+o=104.5636;                                             % RAAN
+i=95.2886;                                              % Inclination
+w=189.5932;                                             % Argument of Periapsis
+DCM=[cos(o),-sin(o),0;sin(o),cos(o),0;0,0,1]*[1 0 0;0 cos(i) -sin(i);0 sin(i) cos(i)]*[cos(w) -sin(w) 0; sin(w) cos(w) 0; 0 0 1];
+
+r1=DCM*r1_cartesian;                                    % Writing r1 and r2 in ECI frame
+r2=DCM*r2_cartesian;
+
+%Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of %debri orbit
+r1cr2=cross(r1,r2);
+r1r2=norm(r1)*norm(r2);
+if r1cr2(3,1)>=0;
+    deltheta=acos(dot(r1,r2)/r1r2);
+else
+    deltheta=360-acos(dot(r1,r2)/r1r2);
+
+A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));
+
+
+
 
 
