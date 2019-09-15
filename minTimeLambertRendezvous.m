@@ -46,34 +46,34 @@ while abs((f/f_dash))>0.000001;                         % Newtons method to find
     f_dash=1-e*cos(eai_quarter); 
 end
 
-ta_quarter=2*atan(sqrt((1+e)/(1-e))*tan(ea_quarter/2))*180/3.14;    % ta=True Anomaly (in degrees) 
-r_quarter=(h_d^2/u)*(1+e*cos(ta_quarter))^(-1);
+ta_quarter=2*atand(sqrt((1+e)/(1-e))*tand(ea_quarter/2))*180/3.14;    % ta=True Anomaly (in degrees) 
+r_quarter=(h_d^2/u)*(1+e*cosd(ta_quarter))^(-1);
 r2_cylindrical=r_quarter;
 
 % Converting radial vectors to ECI frame
 ta_debri=ta_quarter;
 ta_chaser=0;                                             % True Anomaly of chaser
-r1_cartesian=[r1_cylindrical*cos(ta_chaser);r1_cylindrical*sin(ta_chaser);0];
-r2_cartesian=[r2_cylindrical*cos(ta_debri);r1_cylindrical*sin(ta_debri);0];
+r1_cartesian=[r1_cylindrical*cosd(ta_chaser);r1_cylindrical*sind(ta_chaser);0];
+r2_cartesian=[r2_cylindrical*cosd(ta_debri);r1_cylindrical*sind(ta_debri);0];
 
 o=104.5636;                                             % RAAN
 i=95.2886;                                              % Inclination
 w=189.5932;                                             % Argument of Periapsis
-DCM=[cos(o),-sin(o),0;sin(o),cos(o),0;0,0,1]*[1 0 0;0 cos(i) -sin(i);0 sin(i) cos(i)]*[cos(w) -sin(w) 0; sin(w) cos(w) 0; 0 0 1];
+DCM=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w) -sind(w) 0; sind(w) cosd(w) 0; 0 0 1];
 
 r1=DCM*r1_cartesian;                                    % Writing r1 and r2 in ECI frame
 r2=DCM*r2_cartesian;
 
-% Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of %debri orbit
+% Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
 r1cr2=cross(r1,r2);
 r1r2=norm(r1)*norm(r2);
 if r1cr2(3,1)>=0;
-    deltheta=acos(dot(r1,r2)/r1r2);
+    deltheta=acosd(dot(r1,r2)/r1r2);
 else
-    deltheta=360-acos(dot(r1,r2)/r1r2);
+    deltheta=360-acosd(dot(r1,r2)/r1r2);
 end    
 
-A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));           
+A=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));           
 
 % Starting Newtons method to evaluate the z (z is  related to a and universal anomaly) 
 z=0;                                                     % Initializing z
@@ -118,7 +118,7 @@ v2n_t=norm(v2_t);
 
 % Calculating velocities of Chaser at r1 and Target at r2
 vpd_2=h_d/r2n;                                                  % Perpendicular component of velocity of the debri at 2
-vrd_2=(u/h_d)*e*sin(ta_quarter);
+vrd_2=(u/h_d)*e*sind(ta_quarter);
 vd_2=sqrt(vpd_2^2+vrd_2^2);
 h_c=sqrt(u*r1n*(1+e));
 vpc_1=h_c/r1n;                                                  % Perpedicular component of velocity of Chaser at 1 
@@ -133,12 +133,12 @@ delv(1,1)=abs(delv1(1,1))+abs(delv2(1,1));
 
 % Now choosing a retrograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
 if r1cr2(3,1)>=0;
-    deltheta=360-acos(dot(r1,r2)/r1r2);
+    deltheta=360-acosd(dot(r1,r2)/r1r2);
 else
-    deltheta=acos(dot(r1,r2)/r1r2);
+    deltheta=acosd(dot(r1,r2)/r1r2);
 end    
 
-A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));           
+A=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));           
 
 % Starting Newtons method to evaluate the z (z is  related to a and universal anomaly) 
 z=0;                                                     % Initializing z
@@ -195,23 +195,23 @@ end
 % Checking Delta V for different True Anomaly, i.e. after a waiting time
 for i=1:20
     ta_chaser(1,i)=10*i;                                                    % Setting True Anomaly of chaser in degrees
-    r(1,i)=(h_c^2)/(u*(1+e*cos(ta_chaser(1,i))));
-    vrc(1,i)=(u*e*sin(ta_chaser(1,i)))/h_c;                                 % Radial velocity of the chaser at that particular true anomaly   
+    r(1,i)=(h_c^2)/(u*(1+e*cosd(ta_chaser(1,i))));
+    vrc(1,i)=(u*e*sind(ta_chaser(1,i)))/h_c;                                 % Radial velocity of the chaser at that particular true anomaly   
     vpc(1,i)=h_c/r(1,i);                                                    % Perpendicular velocity of the chaser at that True Anomaly    
     vc(1,i)=sqrt(vpc(1,i)^2+vrc(1,i)^2);
-    rc_cartesian=[r(1,i)*cos(ta_chaser(1,i));r(1,i)*sin(ta_chaser(1,i));0];
-    DCM=[cos(o),-sin(o),0;sin(o),cos(o),0;0,0,1]*[1 0 0;0 cos(i) -sin(i);0 sin(i) cos(i)]*[cos(w) -sin(w) 0; sin(w) cos(w) 0; 0 0 1];
+    rc_cartesian=[r(1,i)*cosd(ta_chaser(1,i));r(1,i)*sind(ta_chaser(1,i));0];
+    DCM=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w) -sind(w) 0; sind(w) cosd(w) 0; 0 0 1];
     r1(:,i)=DCM*rc_cartesian;                                    % Writing r1 in ECI frame
 
     % Choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
     r1cr2=cross(r1(:,i),r2);
     r1r2=norm(r1(:,i))*norm(r2);
     if r1cr2(3,1)>=0;
-        deltheta=acos(dot(r1(:,i),r2)/r1r2);
+        deltheta=acosd(dot(r1(:,i),r2)/r1r2);
     else
-        deltheta=360-acos(dot(r1(:,i),r2)/r1r2);
+        deltheta=360-acosd(dot(r1(:,i),r2)/r1r2);
     end    
-    A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));  
+    A=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));  
     
     % Starting Newtons method to evaluate the z (z is  related to a and universal anomaly) 
     z=0;                                                     % Initializing z
@@ -256,3 +256,4 @@ for i=1:20
     delv(1,i)=abs(delv1(1,i))+abs(delv2(1,i));
 end     
     
+% Should check for unit errors
