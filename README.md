@@ -83,6 +83,10 @@ r2n=norm(r2);
 del_t=t_quarter;
 y=r1n+r2n+A*((z*S-1)/C^0.5);
 f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
+if z=0;
+    f_dash=(sqrt(2)/40)*y^1.5+(A/8)*(sqrt(y)+A*sqrt(1/2*y));
+else;
+    f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C))+ 
 
 
 
