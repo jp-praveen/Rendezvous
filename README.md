@@ -86,7 +86,24 @@ f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
 if z=0;
     f_dash=(sqrt(2)/40)*y^1.5+(A/8)*(sqrt(y)+A*sqrt(1/2*y));
 else;
-    f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C))+ 
+    f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
+end    
+    
+while abs((f/f_dash))>0.000001;
+    z_f=z-f/f_dash;
+    z=z_f
+    S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);   
+    C=(1/2)-(z/24)+(z^2/720)-(z^3/40320)+(z^4/3628800);
+    y=r1n+r2n+A*((z*S-1)/C^0.5);
+    f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
+    if z=0;
+        f_dash=(sqrt(2)/40)*y^1.5+(A/8)*(sqrt(y)+A*sqrt(1/2*y));
+    else;
+        f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
+    end
+end    
 
+f=1-y/r1n;
+g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y))-(1/sqrt(u))*(y/C)^1.5;
 
 
