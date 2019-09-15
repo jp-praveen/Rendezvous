@@ -190,26 +190,26 @@ delv(1,2)=abs(delv1(1,2))+abs(delv2(1,2))
 if delv(1,2)<delv(1,1);
     delv_max=floor(delv(1,2));
 else
-    delv_max=floor(delv(1,1);
-    
+    delv_max=floor(delv(1,1));
+end    
 % Checking Delta V for different True Anomaly, i.e. after a waiting time
 for i=1:20
     ta_chaser(1,i)=10*i;                                                    % Setting True Anomaly of chaser in degrees
-    r(1,i)=(h_c^2)/(u(1+e*cos(ta_chaser(1,i))));
+    r(1,i)=(h_c^2)/(u*(1+e*cos(ta_chaser(1,i))));
     vrc(1,i)=(u*e*sin(ta_chaser(1,i)))/h_c;                                 % Radial velocity of the chaser at that particular true anomaly   
     vpc(1,i)=h_c/r(1,i);                                                    % Perpendicular velocity of the chaser at that True Anomaly    
     vc(1,i)=sqrt(vpc(1,i)^2+vrc(1,i)^2);
     rc_cartesian=[r(1,i)*cos(ta_chaser(1,i));r(1,i)*sin(ta_chaser(1,i));0];
     DCM=[cos(o),-sin(o),0;sin(o),cos(o),0;0,0,1]*[1 0 0;0 cos(i) -sin(i);0 sin(i) cos(i)]*[cos(w) -sin(w) 0; sin(w) cos(w) 0; 0 0 1];
-    r1(1,i)=DCM*rc_cartesian;                                    % Writing r1 in ECI frame
+    r1(:,i)=DCM*rc_cartesian;                                    % Writing r1 in ECI frame
 
     % Choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
-    r1cr2=cross(r1(1,i),r2);
-    r1r2=norm(r1(1,i))*norm(r2);
+    r1cr2=cross(r1(:,i),r2);
+    r1r2=norm(r1(:,i))*norm(r2);
     if r1cr2(3,1)>=0;
-        deltheta=acos(dot(r1(1,i),r2)/r1r2);
+        deltheta=acos(dot(r1(:,i),r2)/r1r2);
     else
-        deltheta=360-acos(dot(r1(1,i),r2)/r1r2);
+        deltheta=360-acos(dot(r1(:,i),r2)/r1r2);
     end    
     A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));  
     
@@ -227,7 +227,7 @@ for i=1:20
     else;
         f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
     end    
-    while abs((f/f_dash))>0.000001;                         % Executing Newtons Methods to find Z which is related to f and g  
+    while abs((f/f_dash))>0.01;                         % Executing Newtons Methods to find Z which is related to f and g  
         z_f=z-f/f_dash;
         z=z_f;
         S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);   
@@ -245,10 +245,10 @@ for i=1:20
     g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
     f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
     g_dot=1-(y/r2n);
-    v1_t(1,i)=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
-    v2_t(1,i)=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
-    v1n_t(1,i)=norm(v1_t);
-    v2n_t(1,i)=norm(v2_t);
+    v1_t(:,i)=(r2-f*r1(:,i))/g;                                               % Transfer orbit velocity at r1
+    v2_t(:,i)=(g_dot*r2-r1(:,i))/g;                                           % Transfer orbit velocity at r2
+    v1n_t(1,i)=norm(v1_t(:,i));
+    v2n_t(1,i)=norm(v2_t(:,i));
     
     % Calculating delta V required
     delv1(1,i)=v1n_t(1,i)-vc(1,i);
