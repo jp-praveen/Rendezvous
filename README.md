@@ -71,6 +71,7 @@ if r1cr2(3,1)>=0;
     deltheta=acos(dot(r1,r2)/r1r2);
 else
     deltheta=360-acos(dot(r1,r2)/r1r2);
+end    
 
 A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));           
 
@@ -83,7 +84,7 @@ r2n=norm(r2);
 del_t=t_quarter;
 y=r1n+r2n+A*((z*S-1)/C^0.5);
 f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
-if z=0;
+if z==0;
     f_dash=(sqrt(2)/40)*y^1.5+(A/8)*(sqrt(y)+A*sqrt(1/2*y));
 else;
     f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
@@ -91,12 +92,12 @@ end
     
 while abs((f/f_dash))>0.000001;
     z_f=z-f/f_dash;
-    z=z_f
+    z=z_f;
     S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);   
     C=(1/2)-(z/24)+(z^2/720)-(z^3/40320)+(z^4/3628800);
     y=r1n+r2n+A*((z*S-1)/C^0.5);
     f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
-    if z=0;
+    if z==0;
         f_dash=(sqrt(2)/40)*y^1.5+(A/8)*(sqrt(y)+A*sqrt(1/2*y));
     else;
         f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
@@ -106,13 +107,27 @@ end
 % Calculating the Lagrange functions and Velocities at r1 and r2
 
 f=1-y/r1n;
-g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y))-(1/sqrt(u))*(y/C)^1.5;
+g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
 f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
 g_dot=1-(y/r2n);
 
 v1_t=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
 v2_t=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
+v1n_t=norm(v1_t);
+v2n_t=norm(v2_t);
 
+% Calculating velocities of Chaser at r1 and Target at r2
+vpd_2=h_d/r2n;                                                  % Perpendicular component of velocity of the debri at 2
+vrd_2=(u/h_d)*e*sin(ta_quarter);
+vd_2=sqrt(vpd_2^2+vrd_2^2);
+h_c=sqrt(u*r1n*(1+e));
+vpc_1=h_c/r1n;                                                  % Perpedicular component of velocity of Chaser at 1 
+vc_1=vpc_1;
+
+% Calculating delta V required
+delv1=v1_t-vc_1
+delv2=vd_2-v2_t
+delv=abs(delv1)+abs(delv2)
 
 
 
