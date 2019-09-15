@@ -64,7 +64,7 @@ DCM=[cos(o),-sin(o),0;sin(o),cos(o),0;0,0,1]*[1 0 0;0 cos(i) -sin(i);0 sin(i) co
 r1=DCM*r1_cartesian;                                    % Writing r1 and r2 in ECI frame
 r2=DCM*r2_cartesian;
 
-%Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of %debri orbit
+% Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of %debri orbit
 r1cr2=cross(r1,r2);
 r1r2=norm(r1)*norm(r2);
 if r1cr2(3,1)>=0;
@@ -72,9 +72,17 @@ if r1cr2(3,1)>=0;
 else
     deltheta=360-acos(dot(r1,r2)/r1r2);
 
-A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));
+A=sin(deltheta)*sqrt(r1r2/(1-cos(deltheta)));           
 
-
+% Starting Newtons method to evaluate the z (z is  related to a and universal anomaly) 
+z=0;                                                     % Initializing z
+S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);  % S and C are Stumpff Functions 
+C=(1/2)-(z/24)+(z^2/720)-(z^3/40320)+(z^4/3628800);
+r1n=norm(r1);
+r2n=norm(r2);
+del_t=t_quarter;
+y=r1n+r2n+A*((z*S-1)/C^0.5);
+f=((y/C)^1.5)*S+A*(y^0.5)-(u^0.5)*del_t;
 
 
 
