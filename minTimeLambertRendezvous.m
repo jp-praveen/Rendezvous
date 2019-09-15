@@ -125,9 +125,9 @@ vpc_1=h_c/r1n;                                                  % Perpedicular c
 vc_1=vpc_1;
 
 % Calculating delta V required
-delv1=v1n_t-vc_1
-delv2=vd_2-v2n_t
-delv=abs(delv1)+abs(delv2)
+delv1(1,1)=v1n_t-vc_1;
+delv2(1,1)=vd_2-v2n_t;
+delv(1,1)=abs(delv1(1,1))+abs(delv2(1,1));
 
 %-------------------------------------------------------------------------------------------------------------------------------
 
@@ -182,6 +182,19 @@ v1n_t=norm(v1_t);
 v2n_t=norm(v2_t);
 
 % Calculating delta V required
-delv1=v1n_t-vc_1
-delv2=vd_2-v2n_t
-delv=abs(delv1)+abs(delv2)
+delv1(1,2)=v1n_t-vc_1;
+delv2(1,2)=vd_2-v2n_t;
+delv(1,2)=abs(delv1(1,2))+abs(delv2(1,2))
+
+% Setting up Max DeltaV
+if delv(1,2)<delv(1,1);
+    delv_max=floor(delv(1,2));
+else
+    delv_max=floor(delv(1,1);
+    
+% Checking Delta V for different True Anomaly, i.e. after a waiting time
+for i=1:20
+    ta_target=10*i;                                                    % Setting True Anomaly of target in degrees
+         
+
+
