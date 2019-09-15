@@ -103,7 +103,17 @@ while abs((f/f_dash))>0.000001;
     end
 end    
 
+% Calculating the Lagrange functions and Velocities at r1 and r2
+
 f=1-y/r1n;
 g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y))-(1/sqrt(u))*(y/C)^1.5;
+f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
+g_dot=1-(y/r2n);
+
+v1_t=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
+v2_t=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
+
+
+
 
 
