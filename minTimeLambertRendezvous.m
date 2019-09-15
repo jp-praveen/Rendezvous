@@ -227,7 +227,7 @@ for i=1:20
     else;
         f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
     end    
-    while abs((f/f_dash))>0.01;                         % Executing Newtons Methods to find Z which is related to f and g  
+    while abs((f/f_dash))>0.000001;                         % Executing Newtons Methods to find Z which is related to f and g  
         z_f=z-f/f_dash;
         z=z_f;
         S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);   
