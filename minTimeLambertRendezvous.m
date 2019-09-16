@@ -59,10 +59,10 @@ r2_cartesian=[r2_cylindrical*cosd(ta_debri);r1_cylindrical*sind(ta_debri);0];
 o=104.5636;                                             % RAAN
 i=95.2886;                                              % Inclination
 w=189.5932;                                             % Argument of Periapsis
-DCM=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w) -sind(w) 0; sind(w) cosd(w) 0; 0 0 1];
-
-r1=DCM*r1_cartesian;                                    % Writing r1 and r2 in ECI frame
-r2=DCM*r2_cartesian;
+DCMc=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w) -sind(w) 0; sind(w) cosd(w) 0; 0 0 1];
+DCMt=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w+ta_debri) -sind(w+ta_debri) 0; sind(w+ta_debri) cosd(w+ta_debri) 0; 0 0 1];
+r1=DCMc*r1_cartesian;                                    % Writing r1 and r2 in ECI frame
+r2=DCMt*r2_cartesian;
 
 % Assuming both target and chaser are at periapsis at t=0 and choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
 r1cr2=cross(r1,r2);
@@ -193,14 +193,15 @@ else
     delv_max=floor(delv(1,1));
 end    
 % Checking Delta V for different True Anomaly, i.e. after a waiting time
-for i=1:20
+for i=1:40
     ta_chaser(1,i)=10*i;                                                    % Setting True Anomaly of chaser in degrees
     r(1,i)=(h_c^2)/(u*(1+e*cosd(ta_chaser(1,i))));
     vrc(1,i)=(u*e*sind(ta_chaser(1,i)))/h_c;                                 % Radial velocity of the chaser at that particular true anomaly   
     vpc(1,i)=h_c/r(1,i);                                                    % Perpendicular velocity of the chaser at that True Anomaly    
     vc(1,i)=sqrt(vpc(1,i)^2+vrc(1,i)^2);
     rc_cartesian=[r(1,i)*cosd(ta_chaser(1,i));r(1,i)*sind(ta_chaser(1,i));0];
-    DCM=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(i) -sind(i);0 sind(i) cosd(i)]*[cosd(w) -sind(w) 0; sind(w) cosd(w) 0; 0 0 1];
+    ia=95.2886;                                                             % Inclination Angle          
+    DCM=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(ia) -sind(ia);0 sind(ia) cosd(ia)]*[cosd(w+ta_chaser(1,i)) -sind(w+ta_chaser(1,i)) 0; sind(w+ta_chaser(1,i)) cosd(w+ta_chaser(1,i)) 0; 0 0 1];
     r1(:,i)=DCM*rc_cartesian;                                    % Writing r1 in ECI frame
 
     % Choosing a prograde trajectory(i<90 deg). Rendezvous occurs at t=T/4 of debri orbit
@@ -227,7 +228,7 @@ for i=1:20
     else;
         f_dash=((y/C)^1.5)*((1/2*z)*(C-1.5*S/C)+(3*S^2)/(4*C)) + (A/8)*((3*S*sqrt(y)/C)+A*sqrt(C/y));
     end    
-    while abs((f/f_dash))>0.000001;                         % Executing Newtons Methods to find Z which is related to f and g  
+    while abs((f/f_dash))>0.01;                         % Executing Newtons Methods to find Z which is related to f and g  
         z_f=z-f/f_dash;
         z=z_f;
         S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);   
