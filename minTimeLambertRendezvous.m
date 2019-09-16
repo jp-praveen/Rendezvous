@@ -184,7 +184,7 @@ v2n_t=norm(v2_t);
 % Calculating delta V required
 delv1(1,2)=v1n_t-vc_1;
 delv2(1,2)=vd_2-v2n_t;
-delv(1,2)=abs(delv1(1,2))+abs(delv2(1,2))
+delv(1,2)=abs(delv1(1,2))+abs(delv2(1,2));
 
 % Setting up Max DeltaV
 if delv(1,2)<delv(1,1);
@@ -249,15 +249,15 @@ for i=1:80
     g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
     f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
     g_dot=1-(y/r2n);
-    v1_t(:,i)=(r2-f*r1(:,i))/g;                                               % Transfer orbit velocity at r1
-    v2_t(:,i)=(g_dot*r2-r1(:,i))/g;                                           % Transfer orbit velocity at r2
-    v1n_t(1,i)=norm(v1_t(:,i));
-    v2n_t(1,i)=norm(v2_t(:,i));
+    v1_tp(:,i)=(r2-f*r1(:,i))/g;                                               % Transfer orbit velocity at r1
+    v2_tp(:,i)=(g_dot*r2-r1(:,i))/g;                                           % Transfer orbit velocity at r2
+    v1n_tp(1,i)=norm(v1_tp(:,i));
+    v2n_tp(1,i)=norm(v2_tp(:,i));
     
     % Calculating delta V required
-    delv1_pro(1,i)=v1n_t(1,i)-vc(1,i);
-    delv2_pro(1,i)=vd_2-v2n_t(1,i);
-    delv_pro(1,i)=abs(delv1(1,i))+abs(delv2(1,i));
+    delv1_pro(1,i)=v1n_tp(1,i)-vc(1,i);
+    delv2_pro(1,i)=vd_2-v2n_tp(1,i);
+    delv_pro(1,i)=abs(delv1_pro(1,i))+abs(delv2_pro(1,i));
 end     
 
 %--------------------------------------------------------------------------------------------------------
@@ -316,21 +316,22 @@ for i=1:80
     g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
     f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
     g_dot=1-(y/r2n);
-    v1_t(:,i)=(r2-f*r1(:,i))/g;                                               % Transfer orbit velocity at r1
-    v2_t(:,i)=(g_dot*r2-r1(:,i))/g;                                           % Transfer orbit velocity at r2
-    v1n_t(1,i)=norm(v1_t(:,i));
-    v2n_t(1,i)=norm(v2_t(:,i));
+    v1_tr(:,i)=(r2-f*r1(:,i))/g;                                               % Transfer orbit velocity at r1
+    v2_tr(:,i)=(g_dot*r2-r1(:,i))/g;                                           % Transfer orbit velocity at r2
+    v1n_tr(1,i)=norm(v1_tr(:,i));
+    v2n_tr(1,i)=norm(v2_tr(:,i));
     
     % Calculating delta V required
-    delv1_retro(1,i)=v1n_t(1,i)-vc(1,i);
-    delv2_retro(1,i)=vd_2-v2n_t(1,i);
-    delv_retro(1,i)=abs(delv1(1,i))+abs(delv2(1,i));
+    delv1_retro(1,i)=v1n_tr(1,i)-vc(1,i);
+    delv2_retro(1,i)=vd_2-v2n_tr(1,i);
+    delv_retro(1,i)=abs(delv1_retro(1,i))+abs(delv2_retro(1,i));
 end     
 
 % Plotting Initial true anomaly Vs Delta V required for both trajectory
 
-plot(ta_chaser,delv_pro,'r',ta_chaser,delv_retro,'b');
+plot(ta_chaser,delv_retro,'r',ta_chaser,delv_pro,'b');
 title('Initial True Anomaly of Chaser VS Delta V Required');
 xlabel('Initial True Anomaly of Chaser (in degrees)');
 ylabel('Net Delta V Required (in Km/sec)');
+legend('Retrograde Orbit','Prograde Orbit');
 
