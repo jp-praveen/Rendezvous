@@ -38,7 +38,7 @@ delv_max=18.8;
 
 for i=0:52;
     twait=50*i;                                                   % Waiting time
-    delV=50;
+    % delV=50;
     ma_chaser=(2*pi*twait)/T_c;                     % ma=mean anomaly in radians
     if ma_chaser<pi;                                  % ea=eccentric anomaly     
         eai_chaser=ma_chaser+e/2;                    % initiating ea
@@ -59,8 +59,8 @@ for i=0:52;
     DCMc=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(ia) -sind(ia);0 sind(ia) cosd(ia)]*[cosd(w+ta_chaser) -sind(w+ta_chaser) 0; sind(w+ta_chaser) cosd(w+ta_chaser) 0; 0 0 1];
     r1=DCMc*r1_cartesian;      
     for j=twait:50:t_quarter;
-        j=dt;
-        while delV>delV_max;
+        dt=j;
+        % while delV>delV_max;
             t=twait+dt;
             ma_target=(2*pi*t)/T_t;                     % ma=mean anomaly in radians
             if ma_target<pi;                                  % ea=eccentric anomaly     
@@ -121,16 +121,37 @@ for i=0:52;
                 end
             end    
 
-% Calculating the Lagrange functions and Velocities at r1 and r2
+            % Calculating the Lagrange functions and Velocities at r1 and r2
 
-f=1-y/r1n;
-g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
-f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
-g_dot=1-(y/r2n);
+            f=1-y/r1n;
+            g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
+            f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
+            g_dot=1-(y/r2n);
 
-v1_t=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
-v2_t=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
-v1n_t=norm(v1_t);
-v2n_t=norm(v2_t);
+            v1_t=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
+            v2_t=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
+            v1n_t=norm(v1_t);
+            v2n_t=norm(v2_t);
             
-        
+            % Calculating velocities of Chaser at r1 and Target at r2
+            vpd_2=h_d/r2n;                                                  % Perpendicular component of velocity of the debri at 2
+            vrd_2=(u/h_d)*e*sind(ta_target);
+            vd_2=sqrt(vpd_2^2+vrd_2^2);
+            h_c=sqrt(u*r1n*(1+e));
+            vpc_1=h_c/r1n;                                                  % Perpedicular component of velocity of Chaser at 1 
+            vrc_1=(u/h_c)*e*sind(ta_chaser);
+            vc_1=sqrt(vpc_1^2+vrc_1^2);
+
+            % Calculating delta V required
+            delv1(1,1)=v1n_t-vc_1;
+            delv2(1,1)=vd_2-v2n_t;
+            delv(1,1)=abs(delv1(1,1))+abs(delv2(1,1));
+            
+            if delv(1,1)<delv_max;
+                dv(1,i+1)=delv(1,1);
+                tmin(1,i+1)=t;
+                tcoast(1,i+1)=twait;
+                break;
+            end
+    end    
+end
