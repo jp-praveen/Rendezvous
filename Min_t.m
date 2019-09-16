@@ -39,8 +39,27 @@ delv_max=18.8;
 for i=0:52;
     twait=50*i;                                                   % Waiting time
     delV=50;
+    ma_chaser=(2*pi*twait)/T_c;                     % ma=mean anomaly in radians
+    if ma_chaser<pi;                                  % ea=eccentric anomaly     
+        eai_chaser=ma_chaser+e/2;                    % initiating ea
+    else
+        eai_chaser=ma_chaser-e/2;
+    end
+    f=eai_chaser-e*sin(eai_chaser)-ma_chaser;
+    f_dash=1-e*cos(eai_chaser);
+    while abs((f/f_dash))>0.000001;                         % Newtons method to find eccentric anomaly 
+        ea_chaser=eai_chaser-(f/f_dash);
+        eai_chaser=ea_chaser;
+        f=eai_chaser-e*sin(eai_chaser)-ma_chaser;
+        f_dash=1-e*cos(eai_chaser); 
+    end
+    ta_chaser=2*atand(sqrt((1+e)/(1-e))*tand(ea_chaser/2))*180/3.14;    % ta=True Anomaly (in degrees) 
+    r1_cylindrical=(h_d^2/u)*(1+e*cosd(ta_chaser))^(-1);
+    r1_cartesian=[r1_cylindrical*cosd(ta_chaser);r1_cylindrical*sind(ta_chaser);0];
+    DCMc=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(ia) -sind(ia);0 sind(ia) cosd(ia)]*[cosd(w+ta_chaser) -sind(w+ta_chaser) 0; sind(w+ta_chaser) cosd(w+ta_chaser) 0; 0 0 1];
+    r1=DCMc*r1_cartesian;      
     for j=twait:50:t_quarter;
-    j=dt;
+        j=dt;
         while delV>delV_max;
             t=twait+dt;
             ma_target=(2*pi*t)/T_t;                     % ma=mean anomaly in radians
@@ -59,7 +78,7 @@ for i=0:52;
             end
             ta_target=2*atand(sqrt((1+e)/(1-e))*tand(ea_target/2))*180/3.14;    % ta=True Anomaly (in degrees) 
             r2_cylindrical=(h_d^2/u)*(1+e*cosd(ta_target))^(-1);
-            r2_cartesian=[r2_cylindrical*cosd(ta_target);r1_cylindrical*sind(ta_target);0];
+            r2_cartesian=[r2_cylindrical*cosd(ta_target);r2_cylindrical*sind(ta_target);0];
             DCMt=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(ia) -sind(ia);0 sind(ia) cosd(ia)]*[cosd(w+ta_target) -sind(w+ta_target) 0; sind(w+ta_target) cosd(w+ta_target) 0; 0 0 1];
             r2=DCMt*r2_cartesian;
             
