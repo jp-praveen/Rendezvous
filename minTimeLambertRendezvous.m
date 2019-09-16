@@ -22,10 +22,10 @@ vr_d=dot(vel_d,pos_d)/r_d;
 vp_d=sqrt(v_d^2-vr_d^2);
 h_d=r_d*vp_d;
 a_debri=(h_d^2/u)/(1-e^2);                                    % in km
-a_target=a_debri+50;                                          % in km  
+a_chaser=a_debri+50;                                          % in km  
 rp_debri=a_debri*(1-e);
-rp_target=a_target*(1-e);
-r1_cylindrical=rp_target;
+rp_chaser=a_chaser*(1-e);
+r1_cylindrical=rp_chaser;
 
 %Calculating time period(T) of debri and finding the position at t=T/4
 T=(2*pi*a_debri^(3/2))/u^0.5;
