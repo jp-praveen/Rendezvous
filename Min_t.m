@@ -58,7 +58,7 @@ for i=0:52;
     r1_cartesian=[r1_cylindrical*cosd(ta_chaser);r1_cylindrical*sind(ta_chaser);0];
     DCMc=[cosd(o),-sind(o),0;sind(o),cosd(o),0;0,0,1]*[1 0 0;0 cosd(ia) -sind(ia);0 sind(ia) cosd(ia)]*[cosd(w+ta_chaser) -sind(w+ta_chaser) 0; sind(w+ta_chaser) cosd(w+ta_chaser) 0; 0 0 1];
     r1=DCMc*r1_cartesian;      
-    for j=twait:50:t_quarter;
+    for j=0:50:t_quarter-twait;
         dt=j;
         
             t=twait+dt;
