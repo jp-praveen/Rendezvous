@@ -131,7 +131,7 @@ for i=0:52;
             v1_t=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
             v2_t=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
             v1n_t=norm(v1_t);
-            v2n_t=norm(v2_t);
+            v2n_t=norm(v2_t); % ---------------------------------------------------> should v be converted to a ECI frame or is it in ECI 
             
             % Calculating velocities of Chaser at r1 and Target at r2
             vpd_2=h_d/r2n;                                                  % Perpendicular component of velocity of the debri at 2
