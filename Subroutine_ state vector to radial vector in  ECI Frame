@@ -1,5 +1,5 @@
 function [r] = radialvec (position_vector,true_anomaly,RAAN,inclination,perigee)        % all angles in degrees  
-u=u=398588.738;                                                % in km^3*s^-2    
+u=398588.738;                                                % in km^3*s^-2    
 r_d=norm(pos_d);
 r_cartesian=[r_d*cosd(true_anomaly);r_d*sind(true_anomaly);0];
 DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+true_anomaly) -sind(perigee+true_anomaly) 0; sind(perigee+true_anomaly) cosd(perigee+true_anomaly) 0; 0 0 1];
