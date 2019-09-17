@@ -25,7 +25,7 @@ a_debri=(h_d^2/u)/(1-e^2);                                    % in km
 a_chaser=a_debri+50;                                          % in km  
 rp_debri=a_debri*(1-e);
 rp_chaser=a_chaser*(1-e);
-r1_cylindrical=rp_chaser
+r1_cylindrical=rp_chaser;
 
 o=104.5636;                                             % RAAN
 ia=95.2886;                                             % Inclination
@@ -60,7 +60,7 @@ for i=0:52;
     r1=DCMc*r1_cartesian;      
     for j=twait:50:t_quarter;
         dt=j;
-        % while delV>delV_max;
+        
             t=twait+dt;
             ma_target=(2*pi*t)/T_t;                     % ma=mean anomaly in radians
             if ma_target<pi;                                  % ea=eccentric anomaly     
@@ -151,7 +151,12 @@ for i=0:52;
                 dv(1,i+1)=delv(1,1);
                 tmin(1,i+1)=t;
                 tcoast(1,i+1)=twait;
+                transfer_time(1,i+1)=j;
                 break;
             end
     end    
 end
+plot(tcoast,tmin,'b-o');
+title('Coasting Period VS Tmin');
+xlabel('Coasting time (in seconds)');
+ylabel('Tmin [Coasting time+Transfer time] (in seconds)');
