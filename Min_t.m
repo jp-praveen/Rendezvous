@@ -34,7 +34,7 @@ w=189.5932;                                             % Argument of Periapsis
 T_t=(2*pi*a_debri^(3/2))/u^0.5;
 t_quarter=T_t/4;
 T_c=(2*pi*a_chaser^(3/2))/u^0.5;
-delv_max=18.8;
+delv_max=18;
 
 for i=0:52;
     twait=50*i;                                                   % Waiting time
