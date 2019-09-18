@@ -1,5 +1,8 @@
-function [true_anomaly] = time_tanomaly(t,a,e)
-u=398588.738;                                                % in km^3*s^-2  
+% GIVEN TIME 't' IN ORBIT FIND TRUE ANOMALY
+function [true_anomaly] = time_tanomaly(t,a)
+mat=getparameters;
+u=mat(1,1);
+e=mat(1,6);  
 T=(2*pi*a^(3/2))/sqrt(u);
 mean_anomaly=(2*pi*t)/T;                                     % mean anomaly in radians  
 if mean_anomaly<pi;                                             % initializing eccentric anomaly     
