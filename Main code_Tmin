@@ -1,0 +1,19 @@
+% Minimum time Rendezvous for a given Delta V
+% Debri used: MICROSAT-R DEB 
+% Debri TLE data: 1 44117U 19006C   19257.18743374  .00356745  20455-4  44493-2 0  9990
+%                 2 44117  95.2886 104.5636 0572671 189.5932 169.3966 14.64658678 24390
+% SGP4 output:  X                Y                Z     [km]
+%            542.13411088    -3934.00754565    -5496.24138485 
+%             XDOT             YDOT             ZDOT    [km/s]
+%            -2.04410472        5.83405751       -4.77434023
+
+ia=95.2886;                          % Inclination (degrees)
+o=104.5636;                          % RAAN (degrees)    
+e=0.572671;                          % Eccentricity 
+w=189.5932;                          % Argument of Perigee [Degrees]
+ma_ini=169.3966;                      % Mean Anomaly [Degrees]
+pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
+vel_t_ini=[-2.04410472 5.83405751 -4.77434023];                  % in kmpersec
+
+ta_ini=ma_ta(ma_ini,e);
+
