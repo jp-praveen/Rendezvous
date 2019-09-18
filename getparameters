@@ -4,4 +4,5 @@ global o;
 global ia;
 global w; 
 global ma;
-mat = [u o ia w ma];
+global e;
+mat = [u o ia w ma e];
