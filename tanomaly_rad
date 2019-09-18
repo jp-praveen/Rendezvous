@@ -1,5 +1,9 @@
-function [r] = tanomaly_rad(true_anomaly,h,RAAN,inclination,perigee)
-u=398588.738;                                                % in km^3*s^-2    
+function [r] = tanomaly_rad(true_anomaly,h)
+mat=getparameters;
+u=mat(1,1);
+RAAN=mat(1,2);
+inclination=mat(1,3);
+perigee=mat(1,4);
 r_cylindrical=(h^2/u)*(1+e*cosd(true_anomaly))^(-1);
 r_cartesian=[r_cylindrical*cosd(true_anomaly);r_cylindrical*sind(true_anomaly);0];
 DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+true_anomaly) -sind(perigee+true_anomaly) 0; sind(perigee+true_anomaly) cosd(perigee+true_anomaly) 0; 0 0 1];
