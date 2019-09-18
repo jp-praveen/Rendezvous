@@ -1,3 +1,4 @@
+% GIVEN INITAL POSITIONS AND TRANSFER TIME FIND THE PROGRADE ORBIT
 function [v1,v2,v1_norm,v2_norm] = prograde(r1,r2,transfer_time)
 u=398588.738;                                                % in km^3*s^-2   
 r1cr2=cross(r1,r2);
