@@ -7,13 +7,76 @@
 %             XDOT             YDOT             ZDOT    [km/s]
 %            -2.04410472        5.83405751       -4.77434023
 
-ia=95.2886;                          % Inclination (degrees)
-o=104.5636;                          % RAAN (degrees)    
-e=0.572671;                          % Eccentricity 
-w=189.5932;                          % Argument of Perigee [Degrees]
-ma_ini=169.3966;                      % Mean Anomaly [Degrees]
+setparameters(398588.738,104.5636,95.2886,189.5932,169.3966,0.572671)  % setting the global variable in the order (u,RAAN,Inclination,Perigee,Mean anomaly,e)
+mat=getparameters;
+u=mat(1,1);
+e=mat(1,6);
+dv_max=18;
+
 pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
 vel_t_ini=[-2.04410472 5.83405751 -4.77434023];                  % in kmpersec
 
-ta_ini=ma_ta(ma_ini,e);
+ma_ini=mat(1,5);  %()
+ta_ini=ma_ta(ma_ini);                                            % True anomaly of target's initial position
+[r_t_ini,v_t_ini]=position_velocity_ECI(pos_t_ini,vel_t_ini,ta_ini);   % Position and Velocity of target at initial position in ECI frame
 
+rn_t_ini=norm(r_t_ini);
+vn_t_ini=norm(v_t_ini);
+vr_t_ini=dot(v_t_ini,r_t_ini)/rn_t_ini;
+vp_t_ini=sqrt(vn_t_ini^2-vr_t_ini^2);
+h_t=rn_t_ini*vp_t_ini;
+
+a_target=(h_t^2/u)/(1-e^2);                                    % in km
+a_chaser=a_target+50;                                          % in km  
+h_c=sqrt(a_chaser*u*(1-e^2));                        %()
+
+rp_target=a_target*(1-e);                               % Periapsis distance in target orbit 
+rp_chaser=a_chaser*(1-e);                               % Periapsis distance in target orbit
+
+T_t=(2*pi*a_target^(3/2))/u^0.5;
+T_c=(2*pi*a_chaser^(3/2))/u^0.5;
+
+for twait=0:100:0.25*T_c;                                   % Waiting Time
+    ma_chaser=(2*pi*twait)/T_c;                        % mean anomaly of chaser in radians
+    ma_chaser_deg=ma_chaser*180/pi;
+    ta_chaser_deg=ma_ta(ma_chaser_deg);
+    r1=tanomaly_rad(ta_chaser_deg,h_c);
+    
+    for dt=50:100:0.25*T_t;
+        t=twait+dt;
+        ma_target=(2*pi*t)/T_t;                         % mean anomaly of target in radians
+        ma_target_deg=ma_target*180/pi;
+        ta_target_deg=ma_ta(ma_target_deg);
+        r2=tanomaly_rad(ta_target_deg,h_t);
+        
+        [v1_transfer,v2_transfer,v1n_transfer,v2n_transfer] = prograde(r1,r2,dt);
+        r1n=norm(r1);
+        r2n=norm(r2);
+        
+        vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
+        vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
+        vt=sqrt(vp_t^2+vr_t^2);                        % Normalized velocity of the target
+        vp_c=h_c/r1n;                                  % Perpendicular velocity of the chaser
+        vr_c=(u/h_c)*e*sind(ta_chaser_deg);            % Radial Velocity of the chaser 
+        vc=sqrt(vp_c^2+vr_c^2);                        % Normalized velocity of the target
+        
+        dv1=v1n_transfer-vc;
+        dv2=v2n_transfer-vt;
+        dv=abs(dv1)+abs(dv2);
+        
+        if dv<dv_max;
+                deltav(1,i+1)=dv;
+                tmin(1,i+1)=t;
+                tcoast(1,i+1)=twait;
+                transfer_time(1,i+1)=dt;
+                break;
+        end
+    end    
+end 
+
+plot(tcoast,tmin,'b-o');
+title('Coasting Period VS Tmin');
+xlabel('Coasting time (in seconds)');
+ylabel('Tmin [Coasting time+Transfer time] (in seconds)');
+    
+    
