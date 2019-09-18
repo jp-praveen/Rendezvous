@@ -1,0 +1,7 @@
+function mat=getparameters 
+global u; 
+global o;
+global ia;
+global w; 
+global ma;
+mat = [u o ia w ma];
