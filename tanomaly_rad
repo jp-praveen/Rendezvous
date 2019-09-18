@@ -1,3 +1,4 @@
+% GIVEN TRUE ANOMALY IN AN ORBIT FIND THE EQUIVALENT POSITION VECTOR IN ECI FRAME
 function [r] = tanomaly_rad(true_anomaly,h)
 mat=getparameters;
 u=mat(1,1);
