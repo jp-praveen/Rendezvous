@@ -11,7 +11,7 @@ setparameters(398588.738,104.5636,95.2886,189.5932,169.3966,0.572671)  % setting
 mat=getparameters;
 u=mat(1,1);
 e=mat(1,6);
-dv_max=18;
+dv_max=15;
 
 pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
 vel_t_ini=[-2.04410472 5.83405751 -4.77434023];                  % in kmpersec
@@ -35,8 +35,9 @@ rp_chaser=a_chaser*(1-e);                               % Periapsis distance in 
 
 T_t=(2*pi*a_target^(3/2))/u^0.5;
 T_c=(2*pi*a_chaser^(3/2))/u^0.5;
-
+i=-1;
 for twait=0:100:0.25*T_c;                                   % Waiting Time
+    i=i+1;
     ma_chaser=(2*pi*twait)/T_c;                        % mean anomaly of chaser in radians
     ma_chaser_deg=ma_chaser*180/pi;
     ta_chaser_deg=ma_ta(ma_chaser_deg);
@@ -49,7 +50,7 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         ta_target_deg=ma_ta(ma_target_deg);
         r2=tanomaly_rad(ta_target_deg,h_t);
         
-        [v1_transfer,v2_transfer,v1n_transfer,v2n_transfer] = prograde(r1,r2,dt);
+        [v1_transfer,v2_transfer,v1n_transfer,v2n_transfer] = f_prograde(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
         
@@ -65,18 +66,19 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         dv=abs(dv1)+abs(dv2);
         
         if dv<dv_max;
-                deltav(1,i+1)=dv;
-                tmin(1,i+1)=t;
-                tcoast(1,i+1)=twait;
-                transfer_time(1,i+1)=dt;
-                break;
+            deltav(1,i+1)=dv;
+            tmin(1,i+1)=t;
+            tcoast(1,i+1)=twait;
+            transfer_time(1,i+1)=dt;
+            break;
         end
     end    
 end 
-
+deltav
+transfer_time        
+tcoast;
 plot(tcoast,tmin,'b-o');
 title('Coasting Period VS Tmin');
 xlabel('Coasting time (in seconds)');
-ylabel('Tmin [Coasting time+Transfer time] (in seconds)');
-    
+ylabel('Tmin [Coasting time+Transfer time] (in seconds)');    
     
