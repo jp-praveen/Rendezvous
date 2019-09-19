@@ -1,22 +1,7 @@
 % GIVEN TIME 't' IN ORBIT FIND TRUE ANOMALY
-function [true_anomaly] = time_tanomaly(t,a)
-mat=getparameters;
-u=mat(1,1);
-e=mat(1,6);  
+function [true_anomaly] = time_tanomaly(t,a,e)
+u=398588.738;                                                % in km^3*s^-2  
 T=(2*pi*a^(3/2))/sqrt(u);
-mean_anomaly=(2*pi*t)/T;                                     % mean anomaly in radians  
-if mean_anomaly<pi;                                             % initializing eccentric anomaly     
-    eccentric_anomaly=mean_anomaly+e/2;                                % initiating ea
-else
-    eccentric_anomaly=mean_anomaly-e/2;
-end
-f=eccentric_anomaly-e*sin(eccentric_anomaly)-mean_anomaly;
-f_dash=1-e*cos(eccentric_anomaly);
-while abs((f/f_dash))>0.000001;                         % Newtons method  
-    eccentric_anomaly1=eccentric_anomaly-(f/f_dash);
-    eccentric_anomaly=eccentric_anomaly1;
-    f=eccentric_anomaly-e*sin(eccentric_anomaly)-mean_anomaly;
-    f_dash=1-e*cos(eccentric_anomaly);
-end
-true_anomaly_rad=2*atan(sqrt((1+e)/(1-e))*tan(eccentric_anomaly/2));    
-true_anomaly=true_anomaly_rad*180/3.14                      % ta=True Anomaly (in degrees) 
+mean_anomaly=(2*pi*t)/T;                                     % mean anomaly in radians 
+mean_anomaly_deg=mean_anomaly*180/3.14;                      % mean anomaly in degrees 
+true_anomaly=ma_ta(mean_anomaly_deg);                        % ta=True Anomaly (in degrees) 
