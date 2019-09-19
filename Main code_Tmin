@@ -11,7 +11,7 @@ setparameters(398588.738,104.5636,95.2886,189.5932,169.3966,0.572671)  % setting
 mat=getparameters;
 u=mat(1,1);
 e=mat(1,6);
-dv_max=15;
+dv_max=18;
 
 pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
 vel_t_ini=[-2.04410472 5.83405751 -4.77434023];                  % in kmpersec
