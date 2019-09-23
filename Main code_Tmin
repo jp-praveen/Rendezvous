@@ -11,6 +11,10 @@ setparameters(398588.738,104.5636,95.2886,189.5932,169.3966,0.572671)  % setting
 mat=getparameters;
 u=mat(1,1);
 e=mat(1,6);
+RAAN=mat(1,2);
+inclination=mat(1,3);
+perigee=mat(1,4);
+DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+true_anomaly) -sind(perigee+true_anomaly) 0; sind(perigee+true_anomaly) cosd(perigee+true_anomaly) 0; 0 0 1];
 dv_max=18;
 
 pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
@@ -50,20 +54,22 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         ta_target_deg=ma_ta(ma_target_deg);
         r2=tanomaly_rad(ta_target_deg,h_t);
         
-        [v1_transfer,v2_transfer,v1n_transfer,v2n_transfer] = f_prograde(r1,r2,dt);
+        [v1_transfer,v2_transfer,v1eci_transfer,v2eci_transfer] = f_prograde(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
         
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
         vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
-        vt=sqrt(vp_t^2+vr_t^2);                        % Normalized velocity of the target
+        vt=[vr_t,vp_t,0];                        % velocity vector of the target
+        vt_eci=DCM*vt;
         vp_c=h_c/r1n;                                  % Perpendicular velocity of the chaser
         vr_c=(u/h_c)*e*sind(ta_chaser_deg);            % Radial Velocity of the chaser 
-        vc=sqrt(vp_c^2+vr_c^2);                        % Normalized velocity of the target
+        vc=[vr_c,vp_c,0];                        % Velocity Vector of the target
         
-        dv1=v1n_transfer-vc;
-        dv2=v2n_transfer-vt;
-        dv=abs(dv1)+abs(dv2);
+        dv1=v1eci_transfer-vc;
+        dv2=v2eci_transfer-vt;
+        dv_tot=dv1+dv2;
+        dv=norm(dv_tot);
         
         if dv<dv_max;
             deltav(1,i+1)=dv;
