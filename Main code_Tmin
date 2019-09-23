@@ -14,7 +14,7 @@ e=mat(1,6);
 RAAN=mat(1,2);
 inclination=mat(1,3);
 perigee=mat(1,4);
-DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+true_anomaly) -sind(perigee+true_anomaly) 0; sind(perigee+true_anomaly) cosd(perigee+true_anomaly) 0; 0 0 1];
+
 dv_max=18;
 
 pos_t_ini=[542.13411088 -3934.00754565 -5496.24138485];          % in km
@@ -60,14 +60,17 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
         vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
-        vt=[vr_t,vp_t,0];                        % velocity vector of the target
+        vt=[vr_t;vp_t;0];                        % velocity vector of the target
+        DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+ta_target_deg) -sind(perigee+ta_target_deg) 0; sind(perigee+ta_target_deg) cosd(perigee+ta_target_deg) 0; 0 0 1];
         vt_eci=DCM*vt;
         vp_c=h_c/r1n;                                  % Perpendicular velocity of the chaser
         vr_c=(u/h_c)*e*sind(ta_chaser_deg);            % Radial Velocity of the chaser 
-        vc=[vr_c,vp_c,0];                        % Velocity Vector of the target
+        vc=[vr_c;vp_c;0];                        % Velocity Vector of the target
+        DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+ta_chaser_deg) -sind(perigee+ta_chaser_deg) 0; sind(perigee+ta_chaser_deg) cosd(perigee+ta_chaser_deg) 0; 0 0 1];
+        vc_eci=DCM*vc;
         
-        dv1=v1eci_transfer-vc;
-        dv2=v2eci_transfer-vt;
+        dv1=v1eci_transfer-vc_eci;
+        dv2=v2eci_transfer-vt_eci;
         dv_tot=dv1+dv2;
         dv=norm(dv_tot);
         
@@ -86,5 +89,4 @@ tcoast;
 plot(tcoast,tmin,'b-o');
 title('Coasting Period VS Tmin');
 xlabel('Coasting time (in seconds)');
-ylabel('Tmin [Coasting time+Transfer time] (in seconds)');    
-    
+ylabel('Tmin [Coasting time+Transfer time] (in seconds)');  
