@@ -1,4 +1,4 @@
-% GIVEN POSITION VECTOR AT A GIVEN TRUE ANOMALY, FIND POSITION VECTOR IN ECI FRAME
+% GIVEN POSITION AND VELOCITY VECTOR AT A GIVEN TRUE ANOMALY, FIND POSITION VECTOR IN ECI FRAME
 function [r,v] = position_velocity_ECI (position_vector,velocity_vector,true_anomaly)
 mat=getparameters;
 RAAN=mat(1,2);
