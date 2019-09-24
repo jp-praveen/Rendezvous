@@ -53,7 +53,7 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         ta_target_deg=ma_ta(ma_target_deg);
         r2=tanomaly_rad(ta_target_deg,h_t);
         
-        [v1_transfer,v2_transfer,v1eci_transfer,v2eci_transfer] = f_prograde(r1,r2,dt);
+        [v1eci_transfer,v2eci_transfer] = f_prograde(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
         
