@@ -39,14 +39,14 @@ rp_chaser=a_chaser*(1-e);                               % Periapsis distance in 
 T_t=(2*pi*a_target^(3/2))/u^0.5;
 T_c=(2*pi*a_chaser^(3/2))/u^0.5;
 i=-1;
-for twait=0:100:0.25*T_c;                                   % Waiting Time
+for twait=0:100:T_c;                                   % Waiting Time
     i=i+1;
     ma_chaser=(2*pi*twait)/T_c;                        % mean anomaly of chaser in radians
     ma_chaser_deg=ma_chaser*180/pi;
     ta_chaser_deg=ma_ta(ma_chaser_deg);
     r1=tanomaly_rad(ta_chaser_deg,h_c);
     
-    for dt=50:100:0.25*T_t;
+    for dt=50:100:T_t;
         t=twait+dt;
         ma_target=(2*pi*t)/T_t;                         % mean anomaly of target in radians
         ma_target_deg=ma_target*180/pi;
@@ -60,12 +60,12 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
 
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
         vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
-        vt=[vr_t;vp_t;0]                        % velocity vector of the target
+        vt=[vr_t;vp_t;0];                        % velocity vector of the target
         vt_eci=DCM*vt;
         
         vp_c=h_c/r1n;                                  % Perpendicular velocity of the chaser
         vr_c=(u/h_c)*e*sind(ta_chaser_deg);            % Radial Velocity of the chaser 
-        vc=[vr_c;vp_c;0]                        % Velocity Vector of the target
+        vc=[vr_c;vp_c;0];                        % Velocity Vector of the target
         vc_eci=DCM*vc;
         
         dv1=v1eci_transfer-vc;
@@ -77,13 +77,20 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
             tmin(1,i+1)=t;
             tcoast(1,i+1)=twait;
             transfer_time(1,i+1)=dt;
+            true_anomaly_target(1,i+1)=ta_target_deg;
+            true_anomaly_chaser(1,i+1)=ta_chaser_deg;
             break;
         end
     end    
 end 
-deltav
-transfer_time        
-tcoast
+[a,b]=size(tcoast);
+for k=1:b;
+    if tcoast(1,1)==0 & tmin(1,1)==0 ;
+        tcoast(tcoast==0)=[];
+        tmin(tmin==0)=[];
+        transfer_time(transfer_time==0)=[];
+    end
+end
 plot(tcoast,tmin,'b-o');
 title('Coasting Period VS Tmin');
 xlabel('Coasting time (in seconds)');
