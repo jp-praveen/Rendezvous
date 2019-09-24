@@ -23,8 +23,6 @@ vel_t_ini=[-2.04410472 5.83405751 -4.77434023];                  % in kmpersec
 ma_ini=mat(1,5);  %()
 ta_ini=ma_ta(ma_ini);                                            % True anomaly of target's initial position
 
-% [r_t_ini,v_t_ini]=position_velocity_ECI(pos_t_ini,vel_t_ini,ta_ini);   % Position and Velocity of target at initial position in ECI frame
-
 rn_t_ini=norm(pos_t_ini);
 vn_t_ini=norm(vel_t_ini);
 vr_t_ini=dot(vel_t_ini,pos_t_ini)/rn_t_ini;
