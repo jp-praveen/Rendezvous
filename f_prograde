@@ -25,11 +25,11 @@ y=r1n+r2n+A*((z*S-1)/C^0.5);
 % Calculating the Lagrange functions and Velocities at r1 and r2
 
 f=1-y/r1n;
-g=(1/sqrt(u))*((y/C)^1.5*S)+A*sqrt(y)-(1/sqrt(u))*(y/C)^1.5;
+g=(A*sqrt(y)/sqrt(u));
 f_dot=(sqrt(u)/r1n*r2n)*sqrt(y/C)*(z*S-1);
 g_dot=1-(y/r2n);
-v1_eci=(r2-f*r1)/g;                                               % Transfer orbit velocity at r1
-v2_eci=(g_dot*r2-r1)/g;                                           % Transfer orbit velocity at r2
+v1_eci=(r2-f*r1)/g                                               % Transfer orbit velocity at r1
+v2_eci=(g_dot*r2-r1)/g                                           % Transfer orbit velocity at r2
 
 % Calculating the Orbital Elements of the transfer orbit
 %evec = ((norm(v1)^2-u/norm(r1))*r1-dot(r1,v1)*v1)/u;
