@@ -56,15 +56,18 @@ for twait=0:100:0.25*T_c;                                   % Waiting Time
         [v1eci_transfer,v2eci_transfer] = f_prograde(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
-        
+        DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee) -sind(perigee) 0; sind(perigee) cosd(perigee) 0; 0 0 1];
+
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
         vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
         vt=[vr_t;vp_t;0]                        % velocity vector of the target
+        vt_eci=DCM*vt;
         
         vp_c=h_c/r1n;                                  % Perpendicular velocity of the chaser
         vr_c=(u/h_c)*e*sind(ta_chaser_deg);            % Radial Velocity of the chaser 
         vc=[vr_c;vp_c;0]                        % Velocity Vector of the target
-                
+        vc_eci=DCM*vc;
+        
         dv1=v1eci_transfer-vc;
         dv2=v2eci_transfer-vt;
         dv=norm(dv1)+norm(dv2);
