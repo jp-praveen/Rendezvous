@@ -68,8 +68,8 @@ for twait=0:100:T_c;                                   % Waiting Time
         vc=[vr_c;vp_c;0];                        % Velocity Vector of the target
         vc_eci=DCM*vc;
         
-        dv1=v1eci_transfer-vc;
-        dv2=v2eci_transfer-vt;
+        dv1=v1eci_transfer-vc_eci;
+        dv2=v2eci_transfer-vt_eci;
         dv=norm(dv1)+norm(dv2);
                 
         if dv<dv_max;
