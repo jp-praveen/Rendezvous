@@ -16,7 +16,7 @@ dt=transfer_time;
 A=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));
 setsolveparameters(u,dt,r1n,r2n,A);
 z0=0;
-z=fsolve(@solve_torbit,z0);
+z=fzero(@solve_torbit,z0);
 
 S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);  % S and C are Stumpff Functions 
 C=(1/2)-(z/24)+(z^2/720)-(z^3/40320)+(z^4/3628800);
