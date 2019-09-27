@@ -1,17 +1,17 @@
 % GIVEN R1,R2,dT FIND V1,V2 USING PRUSSINGS ALGORITHM
-function [v1,v2] = lambert(r1,r2,transfer_time)
+function [v1,v2] = lambert_prussing(r1,r2,transfer_time)
 u=398588.738;                             % in km^3*s^-2 
 r1n=norm(r1);
 r2n=norm(r2);
 c=r2-r1;
 cn=norm(c);
-dt=transfer_time;
 s1=(r1n+r2n+cn);
 s2=(r1n+r2n-cn);
+dt=transfer_time;
 sets1s2(s1,s2,u,dt);
         
-a0=r1n;
-at=fzero(@solve_at,a0);                            % Semi major axis of the transfer orbit
+a0=5*r1n;
+at=fsolve(@solve_at,a0);                            % Semi major axis of the transfer orbit
         
 alpha_rad=2*asin(sqrt(s1/(4*at)));                   
 beta_rad=2*asin(sqrt(s2/(4*at)));
@@ -29,7 +29,6 @@ Tanomaly_trans_2=2*atand(sqrt((1+e_t)/(1-e_t))*tand(Eanomaly_trans_2/2));
 DCM_trans=[cosd(RAAN_trans),-sind(RAAN_trans),0;sind(RAAN_trans),cosd(RAAN_trans),0;0,0,1]*[1 0 0;0 cosd(inclination_trans) -sind(inclination_trans);0 sind(inclination_trans) cosd(inclination_trans)]*[cosd(perigee_trans) -sind(perigee_trans) 0; sind(perigee_trans) cosd(perigee_trans) 0; 0 0 1];
       
 h_trans= sqrt(r1n*u*(1+e_t*cosd(Tanomaly_trans_1)));
-h_chaser=sqrt(u*r1n*(1+e));
 vp1_transfer=h_trans/r1n;                                               % Transfer orbit velocity at r1
 vr1_transfer=(u/h_trans)*e_t*sind(Tanomaly_trans_1);
 vp2_transfer=h_trans/r2n;                                               % Transfer orbit velocity at r2
