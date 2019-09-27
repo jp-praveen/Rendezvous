@@ -1,5 +1,6 @@
 % GIVEN R1,R2,dT FIND V1,V2 USING PRUSSINGS ALGORITHM
 function [v1,v2] = lambert(r1,r2,transfer_time)
+u=398588.738;                             % in km^3*s^-2 
 r1n=norm(r1);
 r2n=norm(r2);
 c=r2-r1;
