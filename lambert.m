@@ -5,6 +5,7 @@ r1n=norm(r1);
 r2n=norm(r2);
 c=r2-r1;
 cn=norm(c);
+dt=transfer_time;
 s1=(r1n+r2n+cn);
 s2=(r1n+r2n-cn);
 sets1s2(s1,s2,u,dt);
