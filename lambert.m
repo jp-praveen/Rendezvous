@@ -1,5 +1,5 @@
 % GIVEN INITAL POSITIONS AND TRANSFER TIME FIND THE VELOCITIES OF THE PROGRADE TRANSFER ORBIT
-function [v1,v2,RAAN,inclination,perigee,true_anomaly_1,true_anomaly_2] = lambert_book(r1,r2,transfer_time)
+function [v1,v2,RAAN,inclination,perigee,true_anomaly_1,true_anomaly_2] = lambert(r1,r2,transfer_time)
 u=398588.738;                             % in km^3*s^ 
 
 r1cr2=cross(r1,r2);
