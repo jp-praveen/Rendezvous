@@ -59,10 +59,4 @@ perigee = acosd(dot(n,evec)/(norm(n)*e));
 if evec(3,1)<0;
     perigee = 360-perigee;
 end
-DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee) -sind(perigee) 0; sind(perigee) cosd(perigee) 0; 0 0 1];
-   
-   
-v1_norm=norm(v1);
-v2_norm=norm(v2);
-v1_eci=DCM*v1;
-v2_eci=DCM*v2;
+
