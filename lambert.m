@@ -11,10 +11,10 @@ s2=(r1n+r2n-cn);
 dt=transfer_time;
 sets1s2(s1,s2,u,dt);
         
-a0=100*r1n;
-at1=fzero(@solve_at,a0);                            % Semi major axis of the transfer orbit
-at2=fsolve(@solve_at,a0);
-at=(at1+at2)*0.5;
+a0=5*r1n;
+%at=fzero(@solve_at,a0);                            % Semi major axis of the transfer orbit
+at=fsolve(@solve_at,a0);
+%at=(at1+at2)*0.5;
 alpha=2*asin(sqrt(s1/(4*at)));
 beta=2*asin(sqrt(s2/(4*at)));
 
