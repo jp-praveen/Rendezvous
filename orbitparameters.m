@@ -1,9 +1,9 @@
 function [RAAN,inclination,perigee,Tanomaly_1,Tanomaly_2] = orbitparameters(r1,r2,e,Eanomaly_1,Eanomaly_2)
-Tanomaly_1=2*atand(sqrt((1+e)/(1-e))*tand(Eanomaly_1*0.5))*180/3.14;
+Tanomaly_1=2*atan(sqrt((1+e)/(1-e))*tan(Eanomaly_1*0.5))*180/pi;
 if Tanomaly_1<0;
     Tanomaly_1=360+Tanomaly_1;
 end
-Tanomaly_2=2*atand(sqrt((1+e)/(1-e))*tand(Eanomaly_2*0.5))*180/3.14;
+Tanomaly_2=2*atan(sqrt((1+e)/(1-e))*tan(Eanomaly_2*0.5))*180/pi;
 del_theta=Tanomaly_2-Tanomaly_1;
 if del_theta<180;
     H=cross(r1,r2);
