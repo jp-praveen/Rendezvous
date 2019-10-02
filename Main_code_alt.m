@@ -55,7 +55,7 @@ for twait=0:100:T_c;                                   % Waiting Time
         r1n=norm(r1);
         r2n=norm(r2);
         
-        [v1_short,v2_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,RAAN_long,inclination_long,perigee_long]=lambert_prussing(r1,r2,dt);        
+        [v1_short,v2_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,RAAN_long,inclination_long,perigee_long]=lambert(r1,r2,dt);        
                 
         DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+ta_target_deg) -sind(perigee+ta_target_deg) 0; sind(perigee+ta_target_deg) cosd(perigee+ta_target_deg) 0; 0 0 1];
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
