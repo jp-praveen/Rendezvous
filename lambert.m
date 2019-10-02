@@ -1,5 +1,5 @@
 % GIVEN INITAL POSITIONS AND TRANSFER TIME FIND THE VELOCITIES OF THE PROGRADE TRANSFER ORBIT
-function [v1,v2,RAAN,inclination,perigee,true_anomaly_1,true_anomaly_2] = lambert_book(r1,r2,transfer_time)
+function [v1,v2,RAAN,inclination,perigee,true_anomaly_1,true_anomaly_2] = lambert(r1,r2,transfer_time)
 u=398588.738;                             % in km^3*s^ 
 
 r1cr2=cross(r1,r2);
@@ -47,31 +47,7 @@ if v2_r>=0
 else
     true_anomaly_2=360-acosd(dot(evec,r2)/(e*r2n));
 end
-abs(true_anomaly_2-true_anomaly_1)
-mean_anomaly_1=2*atand(sqrt((1-e)/(1+e))*tand(true_anomaly_1*0.5))-(e*sqrt(1-e^2)*sind(true_anomaly_1))/(1+e*cosd(true_anomaly_1));
-mean_anomaly_1_rad=mean_anomaly_1*3.14/180;
-setmeananomaly(mean_anomaly_1_rad);
-setparameters(0,0,0,0,0,e);
-if mean_anomaly_1_rad<pi;                                             % initializing eccentric anomaly     
-    eccentric_anomaly1=mean_anomaly_1_rad+e/2;                                % initiating ea
-else
-    eccentric_anomaly1=mean_anomaly_1_rad-e/2;
-end
-eccentric_anomaly_1=fsolve(@solve_eccentricanomaly,eccentric_anomaly1);
-true_anomaly_rad=2*atan(sqrt((1+e)/(1-e))*tan(eccentric_anomaly_1/2));    
-true_anomaly_1check=true_anomaly_rad*180/3.14;  
-
-mean_anomaly_2=2*atand(sqrt((1-e)/(1+e))*tand(true_anomaly_2*0.5))-(e*sqrt(1-e^2)*sind(true_anomaly_2))/(1+e*cosd(true_anomaly_2));
-mean_anomaly_2_rad=mean_anomaly_2*3.14/180;
-setmeananomaly(mean_anomaly_2_rad);
-if mean_anomaly_2_rad<pi;                                             % initializing eccentric anomaly     
-    eccentric_anomaly1=mean_anomaly_2_rad+e/2;                                % initiating ea
-else
-    eccentric_anomaly1=mean_anomaly_2_rad-e/2;
-end
-eccentric_anomaly_2=fsolve(@solve_eccentricanomaly,eccentric_anomaly1);
-true_anomaly_rad=2*atan(sqrt((1+e)/(1-e))*tan(eccentric_anomaly_2/2));    
-true_anomaly_2check=true_anomaly_rad*180/3.14;    
+   
 
 h=cross(transpose(r1),transpose(v1));
 K=[0,0,1];
@@ -88,13 +64,7 @@ if evec(3,1)<0;
     perigee = 360-perigee;
 end
 
-hn=norm(h);
-a=hn^2/(u*(1-e^2))
-Edifference=0.0409;
-universal_anomaly=sqrt(a)*Edifference
-z_exp=universal_anomaly^2/a
-%universal_anomaly=sqrt(z*a)
-%Edifference=universal_anomaly/sqrt(a)
+
 DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee) -sind(perigee) 0; sind(perigee) cosd(perigee) 0; 0 0 1];
    
    
