@@ -53,7 +53,7 @@ for twait=0:100:T_c;                                   % Waiting Time
         ta_target_deg=ma_ta(ma_target_deg);             % true anomaly of  target in degrees    
         r2=tanomaly_rad(ta_target_deg,h_t);
         
-        [v1_pro,v2_pro,RAAN_pro,inclination_pro,perigee_pro,ta_1_pro,ta_2_pro,v1_retro,v2_retro,RAAN_retro,inclination_retro,perigee_retro,ta_1_retro,ta_2_retro]=lambert_book(r1,r2,dt);
+        [v1_pro,v2_pro,RAAN_pro,inclination_pro,perigee_pro,ta_1_pro,ta_2_pro,v1_retro,v2_retro,RAAN_retro,inclination_retro,perigee_retro,ta_1_retro,ta_2_retro]=lambert(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
         
