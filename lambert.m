@@ -11,9 +11,9 @@ s2=(r1n+r2n-cn)
 dt=transfer_time;
 sets1s2(s1,s2,u,dt);
         
-a0=12000;
+a0=10*r1n;
 %options = optimset('Display','iter'); % show iterations
-at=fzero(@solve_at,a0)                            % Semi major axis of the transfer orbit
+at=fsolve(@solve_at,a0)                            % Semi major axis of the transfer orbit
 %at=2.9987e+03;
 %options = optimset('MaxFunEvals',1000)
 %at=fsolve(@solve_at,a0,options);
@@ -30,7 +30,7 @@ g2=1-r1n/at;
        
 Eanomaly_trans_1=atan2(g1,g2);
 Eanomaly_trans_2=Eanomaly_trans_1+alpha-beta;
-Edifference=Eanomaly_trans_2-Eanomaly_trans_1
+
 e_t=(1-r1n/at)/cos(Eanomaly_trans_1)
 
 [RAAN_trans,inclination_trans,perigee_trans,ta_1,ta_2]=orbitparameters(r1,r2,e_t,Eanomaly_trans_1,Eanomaly_trans_2);
