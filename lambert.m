@@ -1,95 +1,141 @@
-% GIVEN R1,R2,dT FIND V1,V2 USING PRUSSINGS ALGORITHM
-function [v1_short,v2_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,RAAN_long,inclination_long,perigee_long] = lambert(r1,r2,transfer_time)
-u=398588.738;                             % in km^3*s^-2 
-
+% GIVEN INITAL POSITIONS AND TRANSFER TIME FIND THE VELOCITIES OF THE PROGRADE TRANSFER ORBIT
+function [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert(r1,r2,transfer_time)
+u=398588.738;                             % in km^3*s^ 
+dt=transfer_time;
+r1cr2=cross(r1,r2);
+r1r2=norm(r1)*norm(r2);
 r1n=norm(r1);
 r2n=norm(r2);
-c=r2-r1;
-cn=norm(c);
-s1=(r1n+r2n+cn);
-s2=(r1n+r2n-cn);
-dt=transfer_time;
-sets1s2(s1,s2,u,dt);
-        
 
-%SHORT PATH TRANSFER ORBIT
-a0=100*r1n;
-at_short=fsolve(@solve_at_short,a0);                            % Semi major axis of the transfer orbit
-if imag(at_short)==0 & at_short>s1/4;
-    alpha_short=2*asin(sqrt(s1/(4*at_short)));
-    beta_short=2*asin(sqrt(s2/(4*at_short)));
-
-    g1_short=(1-r1n/at_short)*cot(alpha_short-beta_short)-(1-r2n/at_short)*csc(alpha_short-beta_short);
-    g2_short=1-r1n/at_short;
-       
-    Eanomaly_trans_1_short=atan2(g1_short,g2_short);
-    Eanomaly_trans_2_short=Eanomaly_trans_1_short+alpha_short-beta_short;
-
-    e_short=(1-r1n/at_short)/cos(Eanomaly_trans_1_short);
-
-    [RAAN_short,inclination_short,perigee_short,ta_1_short,ta_2_short]=orbitparameters(r1,r2,e_short,Eanomaly_trans_1_short,Eanomaly_trans_2_short);
-
-    h_short= sqrt(r1n*u*(1+e_short*cosd(ta_1_short)));
-
-    vp1_short=h_short/r1n;                                               % Transfer orbit velocity at r1
-    vr1_short=(u/h_short)*e_short*sind(ta_1_short);
-    vp2_short=h_short/r2n;                                               % Transfer orbit velocity at r2
-    vr2_short=(u/h_short)*e_short*sind(ta_2_short);
-
-    DCM_short=[cosd(RAAN_short),-sind(RAAN_short),0;sind(RAAN_short),cosd(RAAN_short),0;0,0,1]*[1 0 0;0 cosd(inclination_short) -sind(inclination_short);0 sind(inclination_short) cosd(inclination_short)]*[cosd(perigee_short+ta_1_short) -sind(perigee_short+ta_1_short) 0; sind(perigee_short+ta_1_short) cosd(perigee_short+ta_1_short) 0; 0 0 1];
-    v1_short_1=[vr1_short;vp1_short;0];
-    v1_short=DCM_short*v1_short_1;
-
-    DCM_short=[cosd(RAAN_short),-sind(RAAN_short),0;sind(RAAN_short),cosd(RAAN_short),0;0,0,1]*[1 0 0;0 cosd(inclination_short) -sind(inclination_short);0 sind(inclination_short) cosd(inclination_short)]*[cosd(perigee_short+ta_2_short) -sind(perigee_short+ta_2_short) 0; sind(perigee_short+ta_2_short) cosd(perigee_short+ta_2_short) 0; 0 0 1];
-
-    v2_short_1=[vr2_short;vp2_short;0];
-    v2_short=DCM_short*v2_short_1;
-else    
-    v1_short=0;
-    v2_short=0;
-    RAAN_short=nan;
-    inclination_short=nan;
-    perigee_short=nan;
-end
-
-%LONG PATH TRANSFER ORBIT
-a0=100*r1n;
-at_long=fsolve(@solve_at_long,a0);                            % Semi major axis of the transfer orbit
-if imag(at_long)==0 & at_long>s1/4;
-    alpha_long=2*pi-2*asin(sqrt(s1/(4*at_long)))
-    beta_long=2*asin(sqrt(s2/(4*at_long)))
- 
-    g1_long=(1-r1n/at_long)*cot(alpha_long-beta_long)-(1-r2n/at_long)*csc(alpha_long-beta_long);
-    g2_long=1-r1n/at_long;
-       
-    Eanomaly_trans_1_long=atan2(g1_long,g2_long);
-    Eanomaly_trans_2_long=Eanomaly_trans_1_long+alpha_long-beta_long;
- 
-    e_long=(1-r1n/at_long)/cos(Eanomaly_trans_1_long)
- 
-    [RAAN_long,inclination_long,perigee_long,ta_1_long,ta_2_long]=orbitparameters(r1,r2,e_long,Eanomaly_trans_1_long,Eanomaly_trans_2_long);
- 
-    h_long= sqrt(r1n*u*(1+e_long*cosd(ta_1_long)))
- 
-    vp1_long=h_long/r1n;                                               % Transfer orbit velocity at r1
-    vr1_long=(u/h_long)*e_long*sind(ta_1_long);
-    vp2_long=h_long/r2n;                                               % Transfer orbit velocity at r2
-    vr2_long=(u/h_long)*e_long*sind(ta_2_long);
- 
-    DCM_long=[cosd(RAAN_long),-sind(RAAN_long),0;sind(RAAN_long),cosd(RAAN_long),0;0,0,1]*[1 0 0;0 cosd(inclination_long) -sind(inclination_long);0 sind(inclination_long) cosd(inclination_long)]*[cosd(perigee_long+ta_1_long) -sind(perigee_long+ta_1_long) 0; sind(perigee_long+ta_1_long) cosd(perigee_long+ta_1_long) 0; 0 0 1];
-    v1_long_1=[vr1_long;vp1_long;0];
-    v1_long=DCM_long*v1_long_1;
- 
-    DCM_long=[cosd(RAAN_long),-sind(RAAN_long),0;sind(RAAN_long),cosd(RAAN_long),0;0,0,1]*[1 0 0;0 cosd(inclination_long) -sind(inclination_long);0 sind(inclination_long) cosd(inclination_long)]*[cosd(perigee_long+ta_2_long) -sind(perigee_long+ta_2_long) 0; sind(perigee_long+ta_2_long) cosd(perigee_long+ta_2_long) 0; 0 0 1];
- 
-    v2_long_1=[vr2_long;vp2_long;0];
-    v2_long=DCM_long*v2_long_1;
+%PROGRADE ORBIT TRANSFER
+if r1cr2(3,1)>=0;
+    deltheta=acosd(dot(r1,r2)/r1r2);                                  % deltheta is change in true anomaly in transfer orbit or Transfer angle
 else
-    v1_long=nan;
-    v2_long=nan;
-    RAAN_long=nan;
-    inclination_long=nan;
-    perigee_long=nan;
+    deltheta=360-acosd(dot(r1,r2)/r1r2);                              % deltheta is in degrees  
+end    
+A_prograde=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));
+setsolveparameters(u,dt,r1n,r2n,A_prograde);
+z0=10;
+
+z_prograde=fsolve(@solve_torbit,z0);
+
+if z_prograde>0 & imag(z_prograde)==0;
+    S_prograde=(1/6)-(z_prograde/120)+(z_prograde^2/5040)-(z_prograde^3/362880)+(z_prograde^4/39916800);  % S and C are Stumpff Functions 
+    C_prograde=(1/2)-(z_prograde/24)+(z_prograde^2/720)-(z_prograde^3/40320)+(z_prograde^4/3628800);
+    y_prograde=r1n+r2n+A_prograde*((z_prograde*S_prograde-1)/C_prograde^0.5);
+
+% Calculating the Lagrange functions and Velocities at r1 and r2
+
+    f_prograde=1-y_prograde/r1n;
+    g_prograde=(A_prograde*sqrt(y_prograde)/sqrt(u));
+    gdot_prograde=1-(y_prograde/r2n);
+    v1_prograde=(r2-f_prograde*r1)/g_prograde;                                               % Transfer orbit velocity at r1
+    v2_prograde=(gdot_prograde*r2-r1)/g_prograde;                                           % Transfer orbit velocity at r2
+
+% Calculating the Orbital Elements of the transfer orbit 
+    evec = ((norm(v1_prograde)^2-u/norm(r1))*r1-dot(r1,v1_prograde)*v1_prograde)/u;
+    e_prograde = norm(evec);
+
+    v1_r=dot(r1,v1_prograde)/r1n;
+    if v1_r>=0
+        true_anomaly_1_prograde=acosd(dot(evec,r1)/(e_prograde*r1n));
+    else
+        true_anomaly_1_prograde=360-acosd(dot(evec,r1)/(e_prograde*r1n));
+    end
+    v2_r=dot(r2,v2_prograde)/r2n;
+    if v2_r>=0
+        true_anomaly_2_prograde=acosd(dot(evec,r2)/(e_prograde*r2n));
+    else
+        true_anomaly_2_prograde=360-acosd(dot(evec,r2)/(e_prograde*r2n));
+    end
+   
+    h_prograde=cross(transpose(r1),transpose(v1_prograde));
+    K=[0,0,1];
+    n_prograde=cross(K,h_prograde);
+    inclination_prograde=acosd((h_prograde(1,3)/norm(h_prograde)));
+    RAAN_prograde = acosd(n_prograde(1,1)/norm(n_prograde));
+    if n_prograde(1,2)<0;
+        RAAN_prograde = 360-RAAN_prograde;
+    end
+
+    perigee_prograde = acosd(dot(n_prograde,evec)/(norm(n_prograde)*e_prograde));
+
+    if evec(3,1)<0;
+        perigee_prograde = 360-perigee_prograde;
+    end
+else
+    v1_prograde=nan;
+    v2_prograde=nan;
+    RAAN_prograde=nan;
+    inclination_prograde=nan;
+    perigee_prograde=nan;
+    true_anomaly_1_prograde=nan;
+    true_anomaly_2_prograde=nan;
 end
+
+
+%RETROGRADE ORBIT TRANSFER
+
+if r1cr2(3,1)>=0;
+    deltheta=360-acosd(dot(r1,r2)/r1r2);                                  % deltheta is change in true anomaly in transfer orbit or Transfer angle
+else
+    deltheta=acosd(dot(r1,r2)/r1r2);                              % deltheta is in degrees  
+end    
+A_retrograde=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));
+setsolveparameters(u,dt,r1n,r2n,A_retrograde);
+z0=10;
+ 
+z_retrograde=fsolve(@solve_torbit,z0);
+if z_retrograde>0 & imag(z_retrograde)==0; 
+    S_retrograde=(1/6)-(z_retrograde/120)+(z_retrograde^2/5040)-(z_retrograde^3/362880)+(z_retrograde^4/39916800);  % S and C are Stumpff Functions 
+    C_retrograde=(1/2)-(z_retrograde/24)+(z_retrograde^2/720)-(z_retrograde^3/40320)+(z_retrograde^4/3628800);
+    y_retrograde=r1n+r2n+A_retrograde*((z_retrograde*S_retrograde-1)/C_retrograde^0.5);
+ 
+% Calculating the Lagrange functions and Velocities at r1 and r2
+ 
+    f_retrograde=1-y_retrograde/r1n;
+    g_retrograde=(A_retrograde*sqrt(y_retrograde)/sqrt(u));
+    gdot_retrograde=1-(y_retrograde/r2n);
+    v1_retrograde=(r2-f_retrograde*r1)/g_retrograde;                                               % Transfer orbit velocity at r1
+    v2_retrograde=(gdot_retrograde*r2-r1)/g_retrograde;                                           % Transfer orbit velocity at r2
+ 
+% Calculating the Orbital Elements of the transfer orbit
+    evec = ((norm(v1_retrograde)^2-u/norm(r1))*r1-dot(r1,v1_retrograde)*v1_retrograde)/u;
+    e_retrograde = norm(evec);
+    v1_r=dot(r1,v1_retrograde)/r1n;
+    if v1_r>=0
+        true_anomaly_1_retrograde=acosd(dot(evec,r1)/(e_retrograde*r1n));
+    else
+        true_anomaly_1_retrograde=360-acosd(dot(evec,r1)/(e_retrograde*r1n));
+    end
+    v2_r=dot(r2,v2_retrograde)/r2n;
+    if v2_r>=0
+        true_anomaly_2_retrograde=acosd(dot(evec,r2)/(e_retrograde*r2n));
+    else
+        true_anomaly_2_retrograde=360-acosd(dot(evec,r2)/(e_retrograde*r2n));
+    end
+ 
+    h_retrograde=cross(transpose(r1),transpose(v1_retrograde));
+    K=[0,0,1];
+    n_retrograde=cross(K,h_retrograde);
+    inclination_retrograde=acosd((h_retrograde(1,3)/norm(h_retrograde)));
+    RAAN_retrograde = acosd(n_retrograde(1,1)/norm(n_retrograde)); 
+    if n_retrograde(1,2)<0;
+       RAAN_retrograde = 360-RAAN_retrograde;
+    end
+    perigee_retrograde = acosd(dot(n_retrograde,evec)/(norm(n_retrograde)*e_retrograde));
+    if evec(3,1)<0;
+        perigee_retrograde = 360-perigee_retrograde;
+    end
+else
+    v1_retrograde=nan;
+    v2_retrograde=nan;
+    RAAN_retrograde=nan;
+    inclination_retrograde=nan;
+    perigee_retrograde=nan;
+    true_anomaly_1_retrograde=nan;
+    true_anomaly_2_retrograde=nan;
+end
+  
 
 
