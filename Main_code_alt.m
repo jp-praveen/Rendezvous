@@ -27,12 +27,11 @@ rn_t_ini=norm(pos_t_ini);
 vn_t_ini=norm(vel_t_ini);
 vr_t_ini=dot(vel_t_ini,pos_t_ini)/rn_t_ini;
 vp_t_ini=sqrt(vn_t_ini^2-vr_t_ini^2);
-
-h_t=rn_t_ini*vp_t_ini;                                  %specific angluar momentum of chaser
+h_t=rn_t_ini*vp_t_ini;
 
 a_target=(h_t^2/u)/(1-e^2);                                    % in km
 a_chaser=a_target+50;                                          % in km  
-h_c=sqrt(a_chaser*u*(1-e^2));                           %specific angluar momentum of chaser
+h_c=sqrt(a_chaser*u*(1-e^2));                        %()
 
 rp_target=a_target*(1-e);                               % Periapsis distance in target orbit 
 rp_chaser=a_chaser*(1-e);                               % Periapsis distance in target orbit
@@ -44,23 +43,20 @@ for twait=0:100:T_c;                                   % Waiting Time
     i=i+1;
     ma_chaser=(2*pi*twait)/T_c;                        % mean anomaly of chaser in radians
     ma_chaser_deg=ma_chaser*180/pi;
-
-    ta_chaser_deg=ma_ta(ma_chaser_deg);                % true anomaly of chaser in degrees   
-
+    ta_chaser_deg=ma_ta(ma_chaser_deg);
     r1=tanomaly_rad(ta_chaser_deg,h_c);
-    
+            
     for dt=50:100:T_t;
         t=twait+dt;
         ma_target=(2*pi*t)/T_t;                         % mean anomaly of target in radians
         ma_target_deg=ma_target*180/pi;
-
-        ta_target_deg=ma_ta(ma_target_deg);             % true anomaly of  target in degrees    
+        ta_target_deg=ma_ta(ma_target_deg);
         r2=tanomaly_rad(ta_target_deg,h_t);
-        
-        [v1_pro,v2_pro,RAAN_pro,inclination_pro,perigee_pro,ta_1_pro,ta_2_pro,v1_retro,v2_retro,RAAN_retro,inclination_retro,perigee_retro,ta_1_retro,ta_2_retro]=lambert(r1,r2,dt);
         r1n=norm(r1);
         r2n=norm(r2);
         
+        [v1_short,v2_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,RAAN_long,inclination_long,perigee_long]=lambert(r1,r2,dt);        
+                
         DCM=[cosd(RAAN),-sind(RAAN),0;sind(RAAN),cosd(RAAN),0;0,0,1]*[1 0 0;0 cosd(inclination) -sind(inclination);0 sind(inclination) cosd(inclination)]*[cosd(perigee+ta_target_deg) -sind(perigee+ta_target_deg) 0; sind(perigee+ta_target_deg) cosd(perigee+ta_target_deg) 0; 0 0 1];
         vp_t=h_t/r2n;                                  % Perpendicular velocity of the target
         vr_t=(u/h_t)*e*sind(ta_target_deg);            % Radial Velocity of the target 
@@ -73,33 +69,32 @@ for twait=0:100:T_c;                                   % Waiting Time
         v_chaser=[vr_c;vp_c;0];                        % Velocity Vector of the target
         v_chaser_eci=DCM*v_chaser;
         
+        dv1_short=v1_short-v_chaser_eci;
+        dv2_short=v2_short-v_target_eci;
+        dv_short_1=norm(dv1_short)+norm(dv2_short);
         
-        dv1_pro=v1_pro-v_chaser_eci;
-        dv2_pro=v2_pro-v_target_eci;
-        dv_prograde_1=norm(dv1_pro)+norm(dv2_pro);
-        
-        dv1_retro=v1_retro-v_chaser_eci;
-        dv2_retro=v2_retro-v_target_eci;
-        dv_retrograde_1=norm(dv1_retro)+norm(dv2_retro);
+        dv1_long=v1_long-v_chaser_eci;
+        dv2_long=v2_long-v_target_eci;
+        dv_long_1=norm(dv1_long)+norm(dv2_long);
             
-        
-            if dv_prograde_1<dv_max | dv_retrograde_1<dv_max;
-                if dv_prograde_1<dv_retrograde_1;
-                    dv(1,i+1)=dv_prograde_1;
-                else 
-                    dv(1,i+1)=dv_retrograde_1;
-                end
-                tmin(1,i+1)=t;
-                tcoast(1,i+1)=twait;
-                transfer_time(1,i+1)=dt;
-                true_anomaly_target(1,i+1)=ta_target_deg;
-                true_anomaly_chaser(1,i+1)=ta_chaser_deg;
-                r_cha(:,i+1)=r1;
-                r_tar(:,i+1)=r2;
-                r_chaser_norm(:,i+1)=r1n;
-                r_target_norm(:,i+1)=r2n;
-                break;
+        if dv_short_1<dv_max | dv_long_1<dv_max;
+            if dv_long_1<dv_short_1;
+                dv(1,i+1)=dv_long_1;
+            else 
+                dv(1,i+1)=dv_short_1;
             end
+            tmin(1,i+1)=t;
+            tcoast(1,i+1)=twait;
+            transfer_time(1,i+1)=dt;
+            true_anomaly_target(1,i+1)=ta_target_deg;
+            true_anomaly_chaser(1,i+1)=ta_chaser_deg;
+            r_cha(:,i+1)=r1;
+            r_tar(:,i+1)=r2;
+            r_chaser_norm(:,i+1)=r1n;
+            r_target_norm(:,i+1)=r2n;
+            break;
+        end
+        
     end    
 end 
 [a,b]=size(tcoast);
