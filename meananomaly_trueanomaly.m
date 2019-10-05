@@ -1,5 +1,5 @@
 % GIVEN MEAN ANOMALY FIND THE EQUIVALENT TRUE ANOMALY IN THE ORBIT
-function [true_anomaly] = ma_ta(mean_anomaly_deg)
+function [true_anomaly] = meananomaly_trueanomaly(mean_anomaly_deg)
 mat=getparameters;
 e=mat(1,6);
 mean_anomaly=mean_anomaly_deg*3.14/180;
