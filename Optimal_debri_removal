@@ -6,7 +6,7 @@ u=398588.738;                             % in km^3*s^-2
 dv_max=20;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
-fname = 'debri_data_swap.txt';
+fname = 'debri_data.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -105,7 +105,7 @@ while k~=0;
             end
         end
     end
-    check=tmin
+    check=tmin;
     min_t(1,j)=min(tmin(tmin>0));
     s=find(tmin==min_t(1,j),1);
     
@@ -114,6 +114,8 @@ while k~=0;
     inclination(1,1)=inclination(1,s+1);
     RAAN(1,1)=RAAN(1,s+1);
     e(1,1)=e(1,s+1);
+    a(1,1)=a(1,s+1);
+    T(1,1)=T(1,s+1);
     perigee(1,1)=perigee(1,s+1);
     h(1,1)=h(1,s+1);
     r_chaser_1=debri_position_1(:,s);
@@ -121,6 +123,7 @@ while k~=0;
 
 % Updating the debri new position and velocities and removing the visited
 % debri
+    a(:,s+1)=[];
     h(:,s+1)=[];
     T(:,s+1)=[]; 
     ma_debri(:,s)=[];
@@ -141,7 +144,7 @@ while k~=0;
         [r2,v2,alpha]=find_r2_v2(r1,v1,dt);
         debri_position_1(:,i)=r2(:,1);
         debri_velocity_1(:,i)=v2(:,1);
-        t_initial(1,i)=t_initial(1,i)+dt;
+        %t_initial(1,i)=t_initial(1,i)+dt;
     end
     visit_sequence(1,j)=flag(1,s);
     flag(:,s)=[];
