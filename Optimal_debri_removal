@@ -6,7 +6,7 @@ u=398588.738;                             % in km^3*s^-2
 dv_max=20;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
-fname = 'debri_data.txt';
+fname = 'debri_data_swap.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -60,7 +60,10 @@ for i=1:n;
         %evec(:,i) = ((norm(debri_velocity_1(:,i-1))^2/u)-norm(debri_position_1(:,i-1))^-1)*debri_position_1(:,i-1)-((dot(debri_position_1(:,i-1),debri_velocity_1(:,i-1)))*debri_velocity_1(:,i-1)/u)
     end  
 end
-debri_position_1(:,[1 2])=debri_position_1(:,[2 1]);
+%debri_position_1(:,[1 2])=debri_position_1(:,[2 1]);
+%debri_velocity_1(:,[1 2])=debri_velocity_1(:,[2 1]);
+
+
 ta_chaser=true_anomaly(1,1);
 k=10;
 j=0;
@@ -68,14 +71,13 @@ while k~=0;
     j=j+1;
     for i=1:n-1;
         DCM=[cosd(RAAN(1,1)),-sind(RAAN(1,1)),0;sind(RAAN(1,1)),cosd(RAAN(1,1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,1)) -sind(inclination(1,1));0 sind(inclination(1,1)) cosd(inclination(1,1))]*[cosd(perigee(1,1)+ta_chaser) -sind(perigee(1,1)+ta_chaser) 0; sind(perigee(1,1)+ta_chaser) cosd(perigee(1,1)+ta_chaser) 0; 0 0 1];
-        r1=DCM*r_chaser_1
-        v1=DCM*v_chaser_1
+        r1=DCM*r_chaser_1;
+        v1=DCM*v_chaser_1;
         for dt=200:200:4000;
             r2_ini=debri_position_1(:,i);
             v2_ini=debri_velocity_1(:,i);
             [r2,v2,alpha]=find_r2_v2(r2_ini,v2_ini,dt);
-            %r2
-            %v2
+            
             ma_deg=(u^2/h(1,i+1)^3)*(1-e(1,i+1)^2)^(1.5)*(t_initial(1,i)+dt);
             ta=ma_ta(ma_deg,e(1,i+1));
             DCM=[cosd(RAAN(1,i+1)),-sind(RAAN(1,i+1)),0;sind(RAAN(1,i+1)),cosd(RAAN(1,i+1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,i+1)) -sind(inclination(1,i+1));0 sind(inclination(1,i+1)) cosd(inclination(1,i+1))]*[cosd(perigee(1,i+1)+ta) -sind(perigee(1,i+1)+ta) 0; sind(perigee(1,i+1)+ta) cosd(perigee(1,i+1)+ta) 0; 0 0 1];
@@ -98,27 +100,41 @@ while k~=0;
                 
                 tmin(1,i)=dt;
                 ta_debri(1,i)=ta;
+                ma_debri(1,i)=ma_deg;
                 break;
             end
         end
     end
-    
+    check=tmin
     min_t(1,j)=min(tmin(tmin>0));
-    s=find(tmin==min_t(1,j),1)
+    s=find(tmin==min_t(1,j),1);
     
-% Updating Chasers new position and velocity
+% Updating Chasers new position, velocity and orbital elements 
     ta_chaser=ta_debri(1,s);
-    
+    inclination(1,1)=inclination(1,s+1);
+    RAAN(1,1)=RAAN(1,s+1);
+    e(1,1)=e(1,s+1);
+    perigee(1,1)=perigee(1,s+1);
+    h(1,1)=h(1,s+1);
     r_chaser_1=debri_position_1(:,s);
     v_chaser_1=debri_velocity_1(:,s);
 
 % Updating the debri new position and velocities and removing the visited
 % debri
+    h(:,s+1)=[];
+    T(:,s+1)=[]; 
+    ma_debri(:,s)=[];
     debri_position_1(:,s)=[];
     debri_velocity_1(:,s)=[];
     t_initial(:,s)=[];
+    inclination(:,s+1)=[];
+    RAAN(:,s+1)=[];
+    e(:,s+1)=[];
+    perigee(:,s+1)=[];
+    
     [l,k]=size(debri_position_1);
     for i=1:k;
+        t_initial(1,i)=(ma_debri(1,i)*T(1,i+1))/(2*pi);
         dt=min_t(1,j);
         r1=debri_position_1(:,i);
         v1=debri_velocity_1(:,i);
