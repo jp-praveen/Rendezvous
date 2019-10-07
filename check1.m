@@ -1,0 +1,1 @@
+function [r2,v2,alpha] = check(r1,v1,dt)
