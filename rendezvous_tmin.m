@@ -3,10 +3,10 @@
 function [visit_sequence, min_t] = rendezvous_tmin(n,x,y,z,xdot,ydot,zdot)
 
 u=398588.738;                             % in km^3*s^-2 
-dv_max=20;                                 % in km/sec
+dv_max=2;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
-fname = 'debri_data_swap.txt';
+fname = 'debri_data.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -47,9 +47,7 @@ for i=1:n;
         v_chaser_1=[xdot(i,1);ydot(i,1);zdot(i,1)];       % Velocity of chaser at initial position
         h(1,i)=sqrt(a(1,i)*u*(1-e(1,i)^2));               % Specific angluar momentum
         T(1,i)=((u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5))^(-1)*(2*pi);              % Time Period   
-        %t_initial(1,i)=(mean_anomaly(1,i)*T(1,i))/(2*pi);
         true_anomaly(1,i)=ma_ta(mean_anomaly(1,i),e(1,i));
-        %evec(:,i) = ((norm(v_chaser_1)^2-u/norm(r_chaser_1))*r_chaser_1-dot(r_chaser_1,v_chaser_1)*v_chaser_1)/u;
     else
         debri_position_1(:,i-1)=[x(i,1);y(i,1);z(i,1)];          % Initial position of debris; nth column implies nth debri data
         debri_velocity_1(:,i-1)=[xdot(i,1);ydot(i,1);zdot(i,1)]; % Initial velocity of debris; nth column implies nth debri data
@@ -57,12 +55,8 @@ for i=1:n;
         T(1,i)=((u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5))^(-1)*(2*pi);                  % Time Period
         t_initial(1,i-1)=(mean_anomaly(1,i)*T(1,i))/(2*pi);
         true_anomaly(1,i)=ma_ta(mean_anomaly(1,i),e(1,i));
-        %evec(:,i) = ((norm(debri_velocity_1(:,i-1))^2/u)-norm(debri_position_1(:,i-1))^-1)*debri_position_1(:,i-1)-((dot(debri_position_1(:,i-1),debri_velocity_1(:,i-1)))*debri_velocity_1(:,i-1)/u)
     end  
 end
-%debri_position_1(:,[1 2])=debri_position_1(:,[2 1]);
-%debri_velocity_1(:,[1 2])=debri_velocity_1(:,[2 1]);
-
 
 ta_chaser=true_anomaly(1,1);
 k=10;
@@ -73,7 +67,7 @@ while k~=0;
         DCM=[cosd(RAAN(1,1)),-sind(RAAN(1,1)),0;sind(RAAN(1,1)),cosd(RAAN(1,1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,1)) -sind(inclination(1,1));0 sind(inclination(1,1)) cosd(inclination(1,1))]*[cosd(perigee(1,1)+ta_chaser) -sind(perigee(1,1)+ta_chaser) 0; sind(perigee(1,1)+ta_chaser) cosd(perigee(1,1)+ta_chaser) 0; 0 0 1];
         r1=DCM*r_chaser_1;
         v1=DCM*v_chaser_1;
-        for dt=200:200:4000;
+        for dt=4000:200:40000;
             r2_ini=debri_position_1(:,i);
             v2_ini=debri_velocity_1(:,i);
             [r2,v2,alpha]=find_r2_v2(r2_ini,v2_ini,dt);
@@ -144,7 +138,7 @@ while k~=0;
         [r2,v2,alpha]=find_r2_v2(r1,v1,dt);
         debri_position_1(:,i)=r2(:,1);
         debri_velocity_1(:,i)=v2(:,1);
-        %t_initial(1,i)=t_initial(1,i)+dt;
+        
     end
     visit_sequence(1,j)=flag(1,s);
     flag(:,s)=[];
