@@ -1,4 +1,3 @@
-% GIVEN TIME 't' IN ORBIT FIND TRUE ANOMALY
 function [true_anomaly] = time_tanomaly(t,a,e)
 u=398588.738;                                                % in km^3*s^-2  
 T=(2*pi*a^(3/2))/sqrt(u);

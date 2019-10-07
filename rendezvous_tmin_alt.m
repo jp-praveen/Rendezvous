@@ -1,6 +1,5 @@
 % Given initial set of debri orbit, find the least time taken by the chaser 
 % to visit all the debri 
-%Check change
 function [visit_sequence, min_t] = rendezvous_tmin_alt(n,x,y,z,xdot,ydot,zdot)
 
 u=398588.738;                             % in km^3*s^-2 

@@ -6,7 +6,7 @@ u=398588.738;                             % in km^3*s^-2
 dv_max=20;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
-fname = 'debri_data.txt';
+fname = 'debri_data_swap.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');

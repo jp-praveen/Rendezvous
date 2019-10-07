@@ -1,5 +1,5 @@
 % GIVEN INITAL POSITIONS AND TRANSFER TIME FIND THE PROGRADE ORBIT
-function [v1_eci,v2_eci] = f_prograde(r1,r2,transfer_time)
+function [v1_eci,v2_eci,z] = f_prograde(r1,r2,transfer_time)
 mat=getparameters;
 u=mat(1,1);                             % in km^3*s^-2 
 
@@ -15,7 +15,7 @@ r2n=norm(r2);
 dt=transfer_time;
 A=sind(deltheta)*sqrt(r1r2/(1-cosd(deltheta)));
 setsolveparameters(u,dt,r1n,r2n,A);
-z0=0;
+z0=[0];
 z=fzero(@solve_torbit,z0);
 
 S=(1/6)-(z/120)+(z^2/5040)-(z^3/362880)+(z^4/39916800);  % S and C are Stumpff Functions 
