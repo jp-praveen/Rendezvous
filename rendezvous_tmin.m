@@ -3,7 +3,7 @@
 function [visit_sequence, min_t] = rendezvous_tmin(n,x,y,z,xdot,ydot,zdot)
 
 u=398588.738;                             % in km^3*s^-2 
-dv_max=2;                                 % in km/sec
+dv_max=20;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
 fname = 'debri_data.txt';
@@ -67,7 +67,7 @@ while k~=0;
         DCM=[cosd(RAAN(1,1)),-sind(RAAN(1,1)),0;sind(RAAN(1,1)),cosd(RAAN(1,1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,1)) -sind(inclination(1,1));0 sind(inclination(1,1)) cosd(inclination(1,1))]*[cosd(perigee(1,1)+ta_chaser) -sind(perigee(1,1)+ta_chaser) 0; sind(perigee(1,1)+ta_chaser) cosd(perigee(1,1)+ta_chaser) 0; 0 0 1];
         r1=DCM*r_chaser_1;
         v1=DCM*v_chaser_1;
-        for dt=4000:200:40000;
+        for dt=100:100:2000;
             r2_ini=debri_position_1(:,i);
             v2_ini=debri_velocity_1(:,i);
             [r2,v2,alpha]=find_r2_v2(r2_ini,v2_ini,dt);
@@ -145,6 +145,7 @@ while k~=0;
     n=n-1;
     tmin=[];
     ta_debri=[];
+    
 end
 
 end
