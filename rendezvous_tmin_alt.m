@@ -64,9 +64,9 @@ j=0;
 while k~=0;
     j=j+1;
     for i=1:n-1;
-        DCM=[cosd(RAAN(1,1)),-sind(RAAN(1,1)),0;sind(RAAN(1,1)),cosd(RAAN(1,1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,1)) -sind(inclination(1,1));0 sind(inclination(1,1)) cosd(inclination(1,1))]*[cosd(perigee(1,1)+ta_chaser) -sind(perigee(1,1)+ta_chaser) 0; sind(perigee(1,1)+ta_chaser) cosd(perigee(1,1)+ta_chaser) 0; 0 0 1];
-        r1=DCM*r_chaser_1;
-        v1=DCM*v_chaser_1;
+        %DCM=[cosd(RAAN(1,1)),-sind(RAAN(1,1)),0;sind(RAAN(1,1)),cosd(RAAN(1,1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,1)) -sind(inclination(1,1));0 sind(inclination(1,1)) cosd(inclination(1,1))]*[cosd(perigee(1,1)+ta_chaser) -sind(perigee(1,1)+ta_chaser) 0; sind(perigee(1,1)+ta_chaser) cosd(perigee(1,1)+ta_chaser) 0; 0 0 1];
+        r1=r_chaser_1;
+        v1=v_chaser_1;
         for dt=100:200:4000;
             r2_ini=debri_position_1(:,i);
             v2_ini=debri_velocity_1(:,i);
@@ -74,9 +74,9 @@ while k~=0;
             
             ma_deg=(u^2/h(1,i+1)^3)*(1-e(1,i+1)^2)^(1.5)*(t_initial(1,i)+dt);
             ta=ma_ta(ma_deg,e(1,i+1));
-            DCM=[cosd(RAAN(1,i+1)),-sind(RAAN(1,i+1)),0;sind(RAAN(1,i+1)),cosd(RAAN(1,i+1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,i+1)) -sind(inclination(1,i+1));0 sind(inclination(1,i+1)) cosd(inclination(1,i+1))]*[cosd(perigee(1,i+1)+ta) -sind(perigee(1,i+1)+ta) 0; sind(perigee(1,i+1)+ta) cosd(perigee(1,i+1)+ta) 0; 0 0 1];
-            r2=DCM*r2_ini;
-            v2=DCM*v2_ini;
+            %DCM=[cosd(RAAN(1,i+1)),-sind(RAAN(1,i+1)),0;sind(RAAN(1,i+1)),cosd(RAAN(1,i+1)),0;0,0,1]*[1 0 0;0 cosd(inclination(1,i+1)) -sind(inclination(1,i+1));0 sind(inclination(1,i+1)) cosd(inclination(1,i+1))]*[cosd(perigee(1,i+1)+ta) -sind(perigee(1,i+1)+ta) 0; sind(perigee(1,i+1)+ta) cosd(perigee(1,i+1)+ta) 0; 0 0 1];
+            %r2=r2;
+            %v2=v2;
             [v1_short,v2_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,dt);
             dv1_short=v1_short-v1;
             dv2_short=v2_short-v2;
@@ -108,7 +108,7 @@ while k~=0;
         select(1,i)=flag(s_vec(i));
     end
     s1=min(select);
-    s=find(select==s1);
+    s=find(flag==s1);
     select=[];
         
     
