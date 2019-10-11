@@ -58,8 +58,8 @@ a0=100*r1n;
 options = optimset('Display','off');
 at_long=fsolve(@solve_at_long,a0,options);                            % Semi major axis of the transfer orbit
 if imag(at_long)==0 & at_long>s1/4 & at_short>s2/4;
-    alpha_long=2*pi-2*asin(sqrt(s1/(4*at_long)))
-    beta_long=2*asin(sqrt(s2/(4*at_long)))
+    alpha_long=2*pi-2*asin(sqrt(s1/(4*at_long)));
+    beta_long=2*asin(sqrt(s2/(4*at_long)));
  
     g1_long=(1-r1n/at_long)*cot(alpha_long-beta_long)-(1-r2n/at_long)*csc(alpha_long-beta_long);
     g2_long=1-r1n/at_long;
@@ -67,11 +67,11 @@ if imag(at_long)==0 & at_long>s1/4 & at_short>s2/4;
     Eanomaly_trans_1_long=atan2(g1_long,g2_long);
     Eanomaly_trans_2_long=Eanomaly_trans_1_long+alpha_long-beta_long;
  
-    e_long=(1-r1n/at_long)/cos(Eanomaly_trans_1_long)
+    e_long=(1-r1n/at_long)/cos(Eanomaly_trans_1_long);
  
     [RAAN_long,inclination_long,perigee_long,ta_1_long,ta_2_long]=orbitparameters(r1,r2,e_long,Eanomaly_trans_1_long,Eanomaly_trans_2_long);
  
-    h_long= sqrt(r1n*u*(1+e_long*cosd(ta_1_long)))
+    h_long= sqrt(r1n*u*(1+e_long*cosd(ta_1_long)));
  
     vp1_long=h_long/r1n;                                               % Transfer orbit velocity at r1
     vr1_long=(u/h_long)*e_long*sind(ta_1_long);

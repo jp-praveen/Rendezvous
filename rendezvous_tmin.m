@@ -1,12 +1,12 @@
 % Given initial set of debri orbit, find the least time taken by the chaser 
 % to visit all the debri 
-function [visit_sequence, min_t] = rendezvous_tmin(n,x,y,z,xdot,ydot,zdot,method)
+function [visit_sequence, min_t] = rendezvous_tmin(n,method)
 
 u=398588.738;                             % in km^3*s^-2 
 dv_max=20;                                 % in km/sec
 flag=[1:n-1];
 % TLE file name 
-fname = 'debri_data_swap.txt';
+fname = 'debri_data.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -41,6 +41,7 @@ fclose(fid);
 % Input 'r' and 'v' values. The first row in position and velocity data
 % corresponds to the chaser. Except for debri_position,t_initial and
 % velocity_position all arrays are (1,n).
+[x,y,z,xdot,ydot,zdot]=test_sgp4;
 for i=1:n;
     if i==1; 
         r_chaser_1=[x(i,1);y(i,1);z(i,1)];                % Initial position of chaser
