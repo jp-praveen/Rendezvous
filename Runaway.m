@@ -7,5 +7,5 @@ n=6;
 %ydot=[0.216240790000000;6.39563389000000;0.198809550000000;4.72943816000000;5.74646706000000;0.102254240000000];
 %zdot=[7.45264753000000;3.92012750000000;7.46259588000000;-5.47818080000000;-2.12905271000000;7.45493993000000];
 
-[sequence,min_t]=rendezvous_tmin(6,1) %1- Curtis method %other than 1- Prussing method
+[sequence,min_t]=rendezvous_tmin(2,1) %1- Curtis method %other than 1- Prussing method
            
