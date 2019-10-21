@@ -6,12 +6,12 @@
 %            542.13411088    -3934.00754565    -5496.24138485 
 %             XDOT             YDOT             ZDOT    [km/s]
 %            -2.04410472        5.83405751       -4.77434023
-n=6;
+n=50;
 method=2;
 u=398588.738;                             % in km^3*s^-2 
 dv_max=0.5;                                 % in km/sec
 re=0;
-fname = 'debri_data.txt';
+fname = 'data_check_paper.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -75,19 +75,20 @@ for i=1:n-1;
         j=j+1;
         r1_ini=r_chaser_1;
         v1_ini=v_chaser_1;
-        [r1,v1,alpha]=find_r2_v2(r1_ini,v1_ini,twait);
+        [r1,v1,alpha,universal_anomaly_chaser]=find_r2_v2(r1_ini,v1_ini,twait,T(1));
         ma_deg_chaser=(u^2/h(1,1)^3)*(1-e(1,1)^2)^(1.5)*(t_initial_chaser+twait)*180/pi;
         ta_chaser=ma_ta(ma_deg_chaser,e(1,1));
         k=0;
-        for dt=1:50:T(i+1);   %
+        for dt=1:100:2*T(i+1)  %
             k=k+1;
             t=twait+dt;
             r2_ini=debri_position_1(:,i);
             v2_ini=debri_velocity_1(:,i);
-            [r2,v2,alpha]=find_r2_v2(r2_ini,v2_ini,t);
+            [r2,v2,alpha,universal_anomaly_target]=find_r2_v2(r2_ini,v2_ini,t,T(i+1));
+            check_r2(i,k)=norm(r2);
+            check_ua_target(i,k)=universal_anomaly_target;
             if isnan(r2)==0 ;
-                
-                
+                             
                 ma_deg_target=(u^2/h(1,i+1)^3)*(1-e(1,i+1)^2)^(1.5)*(t_initial(1,i)+t)*180/pi;
                 ta_target=ma_ta(ma_deg_target,e(1,i+1));
                 dtheta=abs(ta_chaser-ta_target);
@@ -125,6 +126,8 @@ for i=1:n-1;
                     %ma_debri(1,i)=ma_deg;
                     %break;
                 %end
+            else
+                dt
             end
         end
     end
@@ -153,5 +156,17 @@ for i=1:n-1;
     ylabel('dv (in km/s)');  
     dt=[];
     coasting_time=[];
+end
+
+for i=1:n-1;
+    temp=dv(i,:);
+    mindv(i)=min(temp(temp>0));
+end
+
+
+for i=1:n-1;
+    if mindv(i)<1.2;
+        useful_dv(i)=mindv(i);
+    end
 end
 

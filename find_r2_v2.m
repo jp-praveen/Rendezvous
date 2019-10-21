@@ -1,11 +1,15 @@
 % Given r1 and v1 in an orbit, find r2 and v2 at a different time
 % [Algorithm 3.4 in Orbital Mechanics by Howard Curtis
-function [r2,v2,alpha] = find_r2_v2(r1,v1,dt)
+function [r2,v2,alpha,universal_anomaly] = find_r2_v2(r1,v1,dt,T)
 u=398588.738;                             % in km^3*s^-2 
 r0=sqrt(dot(r1,r1));
 v0=sqrt(dot(v1,v1));
 v_r=dot(r1,v1)/r0;                 % Radial velocity
 alpha=(2/r0)-(v0^2/u);
+if dt>T;
+    ratio=floor(dt/T);
+    dt=dt-ratio*T;
+end
 
 universal_anomaly_estimate=sqrt(u)*abs(alpha)*dt;
 z=alpha*universal_anomaly_estimate^2;
@@ -17,7 +21,7 @@ f=((r0*v_r/sqrt(u))*universal_anomaly_estimate^2*C)+((1-alpha*r0)*S*universal_an
 %universal_anomaly=fzero(@solve_r2_v2,universal_anomaly_estimate1,alpha,r0,v0,v_r,u,dt);
 
 universal_anomaly=universal_anomaly_estimate-f/f_dash;
-p=1;
+p=0;
 while abs(f/f_dash)>0.000001;
     p=p+1;
     universal_anomaly=universal_anomaly_estimate-f/f_dash;
