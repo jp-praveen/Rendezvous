@@ -46,17 +46,23 @@ while isempty(open1)==0;
     close2=[];
     close3=[];
     close4=[];
+    close5=[];
+    close6=[];
+    close7=[];
     open3=[];
     open4=[];
     open5=[];
+    open6=[];
+    open7=[];
+    open8=[];
     sequence=[];
     total_cost=[];
     k=3;
     table_info=[];
     for j=1:tn;
-        if isnan(matrixmat(s2,j))==0 & cost1(1)+matrixmat(s2,j)<dvmax;
+        if isnan(matrixmat(s2,j))==0 & cost1(1)+matrixmat(s2,j)<dvmax &j~=s2 &j~=s1;
             open2=[open2 j];
-            close1=[close1 open1(1)];
+            close1=[close1 s2];
             table_info(1,j)=cost1(1)+matrixmat(s2,j);
             table_info(2,j)=s2;
             table_info(3,j)=k;
@@ -64,10 +70,10 @@ while isempty(open1)==0;
             sequence= vertcat(sequence,temp_seq);
             total_cost=vertcat(total_cost,table_info(1,j));
             for q=1:tn;
-                s3=max(open2(1));
-                close2=[close2 open2(1)];
+                s3=max(open2);
+                close2=[close2 s3];
                 %open2=[];
-                if isnan(matrixmat(s3,q))==0 & table_info(1,j)+matrixmat(s3,q)<dvmax;
+                if isnan(matrixmat(s3,q))==0 & table_info(1,j)+matrixmat(s3,q)<dvmax & q~=s1 & q~=open1(1) &q~=j  ;
                     open3=[open3 q];
                     table_info(1,q)=table_info(1,j)+matrixmat(s3,q);
                     table_info(2,q)=s3;
@@ -76,10 +82,10 @@ while isempty(open1)==0;
                     sequence= vertcat(sequence,temp_seq);
                     total_cost=vertcat(total_cost,table_info(1,q));
                     for w=1:tn;
-                        s4=max(open3(1));
-                        close3=[close3 open3(1)];
+                        s4=max(open3);
+                        close3=[close3 s4];
                         %open2=[];
-                        if isnan(matrixmat(s4,w))==0 & table_info(1,q)+matrixmat(s4,w)<dvmax;
+                        if isnan(matrixmat(s4,w))==0 & table_info(1,q)+matrixmat(s4,w)<dvmax & w~=s1 & w~=open1(1) & w~=j &w~=q;
                             open4=[open4 w];
                             table_info(1,w)=table_info(1,q)+matrixmat(s4,w);
                             table_info(2,w)=s4;
@@ -88,10 +94,10 @@ while isempty(open1)==0;
                             sequence= vertcat(sequence,temp_seq);
                             total_cost=vertcat(total_cost,table_info(1,w));
                             for e=1:tn;
-                                s5=max(open4(1));
-                                close4=[close4 open4(1)];
+                                s5=max(open4);
+                                close4=[close4 s5];
                                 %open3=[];
-                                if isnan(matrixmat(s5,e))==0 & table_info(1,w)+matrixmat(s5,e)<dvmax;
+                                if isnan(matrixmat(s5,e))==0 & table_info(1,w)+matrixmat(s5,e)<dvmax & e~=s1 & e~=open1(1) & e~=j & e~=q &e~=w ;
                                     open5=[open5 w];
                                     table_info(1,e)=table_info(1,w)+matrixmat(s5,e);
                                     table_info(2,e)=s5;
@@ -99,6 +105,46 @@ while isempty(open1)==0;
                                     temp_seq=[s1 open1(1) j q w e 0 0 0 0 ];
                                     sequence= vertcat(sequence,temp_seq);
                                     total_cost=vertcat(total_cost,table_info(1,e));
+                                    for r=1:tn;
+                                        s6=max(open5);
+                                        close5=[close5 s6];
+                                        if isnan(matrixmat(s6,r))==0 & table_info(1,e)+matrixmat(s6,r)<dvmax & r~=s1 & r~=open1(1) & r~=j & r~=q &r~=w &r~=e;
+                                            open6=[open6 e];
+                                            table_info(1,r)=table_info(1,e)+matrixmat(s6,r);
+                                            table_info(2,r)=s6;
+                                            table_info(3,r)=k+4;     
+                                            temp_seq=[s1 open1(1) j q w e r 0 0 0 ];
+                                            sequence= vertcat(sequence,temp_seq);
+                                            total_cost=vertcat(total_cost,table_info(1,r));
+                                            for t=1:tn;
+                                                s7=max(open6);
+                                                close6=[close6 s7];
+                                                if isnan(matrixmat(s7,t))==0 & table_info(1,r)+matrixmat(s7,t)<dvmax & t~=s1 & t~=open1(1) & t~=j & t~=q &t~=w &t~=e &t~=r;
+                                                    open7=[open7 r];
+                                                    table_info(1,t)=table_info(1,r)+matrixmat(s7,t);
+                                                    table_info(2,t)=s7;
+                                                    table_info(3,t)=k+5;     
+                                                    temp_seq=[s1 open1(1) j q w e r t 0 0 ];
+                                                    sequence= vertcat(sequence,temp_seq);
+                                                    total_cost=vertcat(total_cost,table_info(1,t));
+                                                    for y=1:tn;
+                                                        s8=max(open7);
+                                                        close7=[close7 s8];
+                                                        if isnan(matrixmat(s8,y))==0 & table_info(1,t)+matrixmat(s8,y)<dvmax & y~=s1 & y~=open1(1) & y~=j & y~=q &y~=w &y~=e &y~=r &y~=t;
+                                                            open8=[open8 t];
+                                                            table_info(1,y)=table_info(1,t)+matrixmat(s8,y);
+                                                            table_info(2,y)=s8;
+                                                            table_info(3,y)=k+6;     
+                                                            temp_seq=[s1 open1(1) j q w e r t y 0 ];
+                                                            sequence= vertcat(sequence,temp_seq);
+                                                            total_cost=vertcat(total_cost,table_info(1,y));
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                                          
                                 end
                             end
                         end
@@ -111,8 +157,9 @@ while isempty(open1)==0;
     cost1(1)=[];
     open1(1)=[];
      table_info;
-     sequence
-     total_cost
+     sequence;
+     total_cost;
+     sequence_cost=[sequence total_cost]
 end
 
                     
