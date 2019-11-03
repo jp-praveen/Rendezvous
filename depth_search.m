@@ -1,5 +1,5 @@
 % Depth First Search
-function [path] = depth_search(totalnode,startnode,dvmax)        
+function [sequence_best] = depth_search(totalnode,startnode,dvmax)        
 load matrixmat.mat;
 matrixmat=matrixmat{:,:};
 matrixmat(1,:) = [];
@@ -38,7 +38,8 @@ end
 open1
 %cost1
 [m,n]=size(open1);
-
+sequence_all=[];
+total_cost_all=[];
 while isempty(open1)==0;
     s2=open1(1);
     open2=[];
@@ -158,11 +159,40 @@ while isempty(open1)==0;
     open1(1)=[];
      table_info;
      sequence;
+     sequence_all=[sequence_all;sequence];
+     total_cost_all=[total_cost_all;total_cost]; 
+     
      total_cost;
-     sequence_cost=[sequence total_cost]
+     %sequence_cost=[sequence total_cost]
+     %sequence_best=[sequence_best cost_best]
+     
+         
 end
-
-                    
+sequence=sequence_all;
+total_cost=total_cost_all;
+sequence_best=[];
+cost_best=[];
+[m,n]=size(sequence);
+for k=1:m;
+    temp=[];
+    for l=1:10
+        if sequence(k,l)~=0;
+            temp=[temp sequence(k,l)];
+        else;
+            break;
+        end
+    end
+    if length(temp)>length(sequence_best);
+        sequence_best=temp;
+        cost_best=total_cost(k);
+    elseif length(temp)==length(sequence_best);
+        if cost_best>total_cost(k);
+            sequence_best=temp;
+            cost_best=total_cost(k);
+        end
+    end
+end
+sequence_best=[sequence_best cost_best];
 
 
         
