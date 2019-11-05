@@ -27,6 +27,9 @@ end
 cost1=temp;
 open1=[];
 for i=1:tn;
+    if isempty(temp)==1;
+        break;
+    end
     if temp(1)==matrixmat(s1,i);
         open1=[open1 i];
         temp(1)=[];
@@ -35,7 +38,7 @@ for i=1:tn;
         end
     end
 end
-open1
+%open1
 %cost1
 [m,n]=size(open1);
 sequence_all=[];
@@ -193,6 +196,7 @@ for k=1:m;
     end
 end
 sequence_best=[sequence_best cost_best];
+
 
 
         

@@ -1,53 +1,16 @@
-function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best)        
+function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,dvmax,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
-method=2;
+method=1;
 u=398588.738;                             % in km^3*s^-2 
-                                 
-fname = 'data_check_paper_1to50.txt';
-
-% Open the TLE file and read TLE elements
-fid = fopen(fname, 'r');
-
-for i=1:2*tn;
-    % read first line
-    tline = fgetl(fid);
-    if ~ischar(tline)
-        break
-    end
-    Cnum(1,i) = str2num(tline(3:7));      			        % Catalog Number (NORAD)
-    epoch(1,i) = str2num(tline(19:32));              % Epoch
-    Etype(1,i) = str2num(tline(63));                          % Ephemeris Type
-    Enum(1,i)  = str2num(tline(65:end));             % Element Number
-    
-    % read second line
-    tline = fgetl(fid);
-    if ~ischar(tline)
-        break
-    end
-    inclination(1,i) = str2num(tline(9:16));                   % Orbit Inclination (degrees)
-    RAAN(1,i) = str2num(tline(18:25));               % Right Ascension of Ascending Node (degrees)
-    e(1,i) = str2num(strcat('0.',tline(27:33)));     % Eccentricity
-    perigee(1,i) = str2num(tline(35:42));              % Argument of Perigee (degrees)
-    mean_anomaly(1,i) = str2num(tline(44:51));                  % Mean Anomaly (degrees)
-    no(1,i) = str2num(tline(53:63));                 % Mean Motion
-    a(1,i) =( u/(no(1,i)*2*pi/86400)^2 )^(1/3);         % semi major axis (m)
-    rNo(1,i) = str2num(tline(64:68));                % Revolution Number at Epoch
-end
-fclose(fid);
-
-[x,y,z,xdot,ydot,zdot]=test_sgp4;
-
-for i=1:tn;
-        debri_position_1(:,i)=[x(i,1);y(i,1);z(i,1)];          % Initial position of debris; nth column implies nth debri data
-        debri_velocity_1(:,i)=[xdot(i,1);ydot(i,1);zdot(i,1)]; % Initial velocity of debris; nth column implies nth debri data
-        h(1,i)=sqrt(a(1,i)*u*(1-e(1,i)^2));                      % specific angluar momentum   
-        T(1,i)=((u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5))^(-1)*(2*pi);                  % Time Period
-        t_initial(1,i)=(mean_anomaly(1,i)*T(1,i))/(2*180);
-        true_anomaly(1,i)=ma_ta(mean_anomaly(1,i),e(1,i));
-     
-end
-
+%mat=getdebrisdata;
+%debri_position_1=mat(1,1);
+%debri_velocity_1=mat(1,2);
+%h=mat(1,3);
+%T=mat(1,4);
+%t_initial=mat(1,5);
+%true_anomaly=mat(1,6);
+                                
 for i=1:tn
     r=debri_position_1(:,i);
     v=debri_velocity_1(:,i);
@@ -69,6 +32,16 @@ for i=1:tn;
         r2_ini=debri_position_new(i,:);
         v2_ini=debri_velocity_new(i,:);
         k=0;
+        if approach~=1;
+            sequence_heuristic = depth_search(50,i,dvmax);
+            sequence_length=length(sequence_heuristic);
+            if sequence_length~=0;
+                heuristic_cost(i)=1/sequence_length;
+            else
+                heuristic_cost(i)=1000;
+            
+            end
+        end
         for dt=100:100:2*T(i);
             k=k+1;
             ma_deg_target=(u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5)*(t_initial(1,i)+twait+dt)*180/pi;
@@ -110,22 +83,39 @@ end
 %dv
 %transfer_time
 for i=1:tn;
-    if i~=s;
+    if i~=sequence_best;
         temp=dv(i,:);
         [minimum,index]=min(temp(temp>0));
         mindv(i)=minimum;
         mindv_dt(i)=transfer_time(i,index);
     else
-        mindv(i)=100;
-        mindv_dt(i)=100;
+        mindv(i)=1000;
+        mindv_dt(i)=1000;
     end
 end
-dv=[];
-transfer_time=[];
-[dv,index]=min(mindv(mindv>0));
-transfer_time=mindv_dt(index);
-time_elapsed=transfer_time+twait;
-next_node=index;
+
+if approach==1;
+    dv=[];
+    transfer_time=[];
+    [dv,index]=min(mindv(mindv>0));
+    transfer_time=mindv_dt(index);
+    time_elapsed=transfer_time+twait;
+    next_node=index;
+else
+    for i=1:tn;
+        totalcost(i)=heuristic_cost(i)+mindv(i)
+    end
+    [m,index]=min(totalcost)
+    dv=[];
+    transfer_time=[];
+    transfer_time=mindv_dt(index);
+    time_elapsed=transfer_time+twait;
+    dv=mindv(index);
+    next_node=index;
+end
+
+
+            
     
     
 
