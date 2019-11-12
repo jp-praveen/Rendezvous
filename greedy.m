@@ -1,5 +1,7 @@
 % If Approach==1 ---> Greedy only
-% If Approach==other than 1 ---> Greedy Heuristic
+% If Approach==2 ---> Greedy Heuristic with heuristic_cost(i)=dvmax/depth search sequence_length;
+% If Approach==3 ---> Greedy Heuristic with heuristic_cost(i)=dvmax/outdegree(i);
+
 function [sequence_best,dv,time_elapsed] = greedy(totalnode,startnode,dvmax,approach) 
 u=398588.738;                             % in km^3*s^-2 
 tn=totalnode;
@@ -54,11 +56,12 @@ end
 %setdebrisdata(debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly);
 
 while dv<dvmax;
-    [time_elapsed,dv_current,next_node] = realistic_position(tn,s,twait,sequence_best,dvmax,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e);
+    dvmax_available=dvmax-dv;
+    [time_elapsed,dv_current,next_node] = realistic_position(tn,s,twait,sequence_best,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e);
     if dv+dv_current<dvmax;
         s=next_node;
         twait=twait+time_elapsed;
-        dv=dv+dv_current
+        dv=dv+dv_current;
         sequence_best=[sequence_best s];
     else
         break;

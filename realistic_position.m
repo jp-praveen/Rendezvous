@@ -1,15 +1,8 @@
-function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,dvmax,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
+function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
 method=1;
 u=398588.738;                             % in km^3*s^-2 
-%mat=getdebrisdata;
-%debri_position_1=mat(1,1);
-%debri_velocity_1=mat(1,2);
-%h=mat(1,3);
-%T=mat(1,4);
-%t_initial=mat(1,5);
-%true_anomaly=mat(1,6);
                                 
 for i=1:tn
     r=debri_position_1(:,i);
@@ -27,16 +20,50 @@ ma_deg_chaser=(u^2/h(s)^3)*(1-e(s)^2)^(1.5)*(t_initial(s)+twait)*180/pi;
 ta_chaser=ma_ta(ma_deg_chaser,e(s));
 
 for i=1:tn;
-    i
+    
     if i~=sequence_best;
         r2_ini=debri_position_new(i,:);
         v2_ini=debri_velocity_new(i,:);
         k=0;
-        if approach~=1;
+        if approach==2;
             sequence_heuristic = depth_search(50,i,dvmax);
             sequence_length=length(sequence_heuristic);
             if sequence_length~=0;
-                heuristic_cost(i)=1/sequence_length;
+                heuristic_cost(i)=dvmax/sequence_length;
+            else
+                heuristic_cost(i)=1000;
+            
+            end
+        elseif approach==3
+            %[possible_start,possible_end]=depth_search.sf1_depth_search(totalnode);
+            %[possible_start]=depth_search('sf1_depth_search',totalnode);
+            load matrixmat.mat;
+            matrixmat=matrixmat{:,:};
+            matrixmat(1,:) = [];                    % Since 1st row and column contains the serial numbers
+            matrixmat(:,1) = [];
+            possible_start=[];
+            possible_end=[];
+            tn=totalnode;
+            for j1=1:tn;
+                for k1=1:50;
+                    if isnan(matrixmat(j1,k1))==0;
+                        possible_start=[possible_start j1];
+                        possible_end=[possible_end k1];
+                    end
+                end
+            end
+            connections=possible_start(possible_start==s);
+            outdegree=length(connections);
+            if outdegree~=0;
+                heuristic_cost(i)=dvmax/outdegree;
+            else
+                heuristic_cost(i)=1000;
+            end
+        elseif approach==4;
+            sequence_heuristic = depth_search(50,i,dvmax_available);
+            sequence_length=length(sequence_heuristic);
+            if sequence_length~=0;
+                heuristic_cost(i)=dvmax/sequence_length;
             else
                 heuristic_cost(i)=1000;
             
@@ -50,6 +77,7 @@ for i=1:tn;
             [r2,v2,alpha,universal_anomaly_target]=find_r2_v2(r2_ini,v2_ini,dt,T(i));
             r2=transpose(r2);
             v2=transpose(v2);
+            %[dv_prograde_1,dv_retrograde_1]=main_code_book_sub1(r1,r2,dt,dtheta,v1,v2);
             if method==1;
                 [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert_book(r1,r2,dt);
             else
@@ -78,6 +106,7 @@ for i=1:tn;
     else 
         dv(i,1)=1000;
         transfer_time(i,1)=1000;
+        heuristic_cost(i)=1000;
     end
 end
 %dv
@@ -103,9 +132,9 @@ if approach==1;
     next_node=index;
 else
     for i=1:tn;
-        totalcost(i)=heuristic_cost(i)+mindv(i)
+        totalcost(i)=heuristic_cost(i)+mindv(i);
     end
-    [m,index]=min(totalcost)
+    [m,index]=min(totalcost);
     dv=[];
     transfer_time=[];
     transfer_time=mindv_dt(index);

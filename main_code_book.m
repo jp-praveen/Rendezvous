@@ -79,7 +79,9 @@ for i=1:n-1;
         ma_deg_chaser=(u^2/h(1,1)^3)*(1-e(1,1)^2)^(1.5)*(t_initial_chaser+twait)*180/pi;
         ta_chaser=ma_ta(ma_deg_chaser,e(1,1));
         k=0;
+        
         for dt=1:100:2*T(i+1)  %
+            
             k=k+1;
             t=twait+dt;
             r2_ini=debri_position_1(:,i);
@@ -92,6 +94,7 @@ for i=1:n-1;
                 ma_deg_target=(u^2/h(1,i+1)^3)*(1-e(1,i+1)^2)^(1.5)*(t_initial(1,i)+t)*180/pi;
                 ta_target=ma_ta(ma_deg_target,e(1,i+1));
                 dtheta=abs(ta_chaser-ta_target);
+                %function [dv_prograde_1,dv_retrograde_1]=main_code_book_sub1(r1,r2,dt,dtheta,v1,v2);
                 if method==1;
                     [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert_book(r1,r2,dt);
                 else
@@ -105,6 +108,7 @@ for i=1:n-1;
                 dv1_retro=v1_retrograde-v1;
                 dv2_retro=v2-v2_retrograde;
                 dv_retrograde_1=norm(dv1_retro)+norm(dv2_retro); 
+                %end
         
                 %if dv_prograde_1<dv_max || dv_retrograde_1<dv_max;
                 

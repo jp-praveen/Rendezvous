@@ -1,11 +1,23 @@
 % Depth First Search
 function [sequence_best] = depth_search(totalnode,startnode,dvmax)        
+
+%function [possible_start,possible_end]=sf1_depth_search(totalnode)
 load matrixmat.mat;
 matrixmat=matrixmat{:,:};
-matrixmat(1,:) = [];
+matrixmat(1,:) = [];                    % Since 1st row and column contains the serial numbers
 matrixmat(:,1) = [];
-
+possible_start=[];
+possible_end=[];
 tn=totalnode;
+for j1=1:tn;
+    for k1=1:50;
+        if isnan(matrixmat(j1,k1))==0;
+            possible_start=[possible_start j1];
+            possible_end=[possible_end k1];
+        end
+    end
+end
+%end
 s1=startnode;
 open1=[];
 cost1=[];
@@ -196,6 +208,7 @@ for k=1:m;
     end
 end
 sequence_best=[sequence_best cost_best];
+end
 
 
 
