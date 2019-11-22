@@ -1,4 +1,4 @@
-function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
+function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
 method=1;
@@ -17,11 +17,15 @@ v1=debri_velocity_new(s,:);
 r1=transpose(r1);
 v1=transpose(v1);
 ma_deg_chaser=(u^2/h(s)^3)*(1-e(s)^2)^(1.5)*(t_initial(s)+twait)*180/pi;
+t_initial(s);
+%twait
+%h(s)
+%e(s)
 ta_chaser=ma_ta(ma_deg_chaser,e(s));
 
 for i=1:tn;
     
-    if i~=sequence_best;
+    if ismember(i,sequence_best)==0 & ismember(i,previous_sequence)==0;
         r2_ini=debri_position_new(i,:);
         v2_ini=debri_velocity_new(i,:);
         k=0;
@@ -114,15 +118,29 @@ end
 for i=1:tn;
     if i~=sequence_best;
         temp=dv(i,:);
-        [minimum,index]=min(temp(temp>0));
-        mindv(i)=minimum;
-        mindv_dt(i)=transfer_time(i,index);
+        [minimum]=min(temp(temp>0));
+        [x,y]=size(temp);
+        for i1=1:y
+            if temp(1,i1)==minimum;
+                index=i1;
+            end
+        end
+        if isempty(minimum)==0;            
+            %i
+            %index
+            mindv(i)=minimum;
+            mindv_dt(i)=transfer_time(i,index);
+        else
+            mindv(i)=1000;
+            mindv_dt(i)=0;
+        end
     else
         mindv(i)=1000;
         mindv_dt(i)=1000;
     end
 end
-
+%mindv
+%mindv_dt
 if approach==1;
     dv=[];
     transfer_time=[];
@@ -138,6 +156,7 @@ else
     dv=[];
     transfer_time=[];
     transfer_time=mindv_dt(index);
+    %transfer_time
     time_elapsed=transfer_time+twait;
     dv=mindv(index);
     next_node=index;

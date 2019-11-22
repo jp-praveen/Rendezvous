@@ -12,12 +12,12 @@ time_elapsed_2=[];
 time_elapsed_3=[];
 time_elapsed_4=[];
 
-for j=1:10;
+for j=1:15;
     j
     for i=1:4;
         i
         if i==1;
-            [sequence_01,dv_01,time_elapsed_01]=greedy(50,j,dvmax,i);
+            [sequence_01,dv_01,time_elapsed_01]=greedy(50,j,dvmax,i)
             sequence_1=padconcatenation(sequence_1,sequence_01,1);
             dv_1=padconcatenation(dv_1,dv_01,1);
             time_elapsed_1=padconcatenation(time_elapsed_1,time_elapsed_01,1);
