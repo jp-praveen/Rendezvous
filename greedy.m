@@ -1,6 +1,8 @@
 % If Approach==1 ---> Greedy only
 % If Approach==2 ---> Greedy Heuristic with heuristic_cost(i)=dvmax/depth search sequence_length;
 % If Approach==3 ---> Greedy Heuristic with heuristic_cost(i)=dvmax/outdegree(i);
+% If Approach==4 ---> Greedy Heuristic with heuristic_cost(i)=dvmax/depth search sequence_length with dvmax_available;
+
 
 function [sequence_best,dv,time_elapsed] = greedy(totalnode,startnode,dvmax,approach,previous_sequence) 
 u=398588.738;                             % in km^3*s^-2 
