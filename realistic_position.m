@@ -1,7 +1,7 @@
 function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
-method=1;
+method=3;
 u=398588.738;                             % in km^3*s^-2 
                                 
 for i=1:tn
@@ -84,8 +84,20 @@ for i=1:tn;
             %[dv_prograde_1,dv_retrograde_1]=main_code_book_sub1(r1,r2,dt,dtheta,v1,v2);
             if method==1;
                 [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert_book(r1,r2,dt);
-            else
+            elseif method==2
                 [v1_prograde,v2_prograde,at_short,RAAN_short,inclination_short,perigee_short,v1_retrograde,v2_retrograde,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,dt,dtheta);
+            else
+                r1=transpose(r1);
+                r2=transpose(r2);
+                v1=transpose(v1);
+                v2=transpose(v2);
+                m=1;
+                [V1, V2, extremal_distances, exitflag] = lambert(r1, r2, dt, m, u);
+                v1_prograde=V1;
+                v2_prograde=V2;
+                v1_retrograde=V1;
+                v2_retrograde=V2;
+                
             end
             
             dv1_pro=v1_prograde-v1;

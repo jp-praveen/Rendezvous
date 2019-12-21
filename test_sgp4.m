@@ -9,7 +9,7 @@ MINUTES_PER_DAY_SQUARED = (MINUTES_PER_DAY * MINUTES_PER_DAY);
 MINUTES_PER_DAY_CUBED = (MINUTES_PER_DAY * MINUTES_PER_DAY_SQUARED);
 
 % TLE file name 
-fname = 'data_check_paper_1to50.txt';
+fname = 'data_check.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');

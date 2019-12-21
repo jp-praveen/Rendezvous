@@ -1,5 +1,5 @@
 % GIVEN R1,R2,dT FIND V1,V2 USING PRUSSINGS ALGORITHM
-function [v1_short,v2_short,at_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,transfer_time,dtheta)
+function [v1_short,v2_short,at_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,transfer_time,dtheta,m)
 u=398588.738;                             % in km^3*s^-2 
 
 r1n=norm(r1);
@@ -13,16 +13,23 @@ dt=transfer_time;
         
 
 %SHORT PATH TRANSFER ORBIT
-a0=r1n;
+a0=100*r1n;
 options = optimset('Display','off');
 %F=sqrt((a_t(1)^3)/u)*((2*asin(sqrt(s1/(4*a_t)))-sin(2*asin(sqrt(s1/(4*a_t)))))-(2*asin(sqrt(s2/(4*a_t)))-sin(2*asin(sqrt(s2/(4*a_t))))))-dt;
 %F_dash= -(a_t^3/u)^(1/2)*(s1/(4*a_t^2*(1 - s1/(4*a_t))^(1/2)*(s1/(4*a_t))^(1/2)) - s2/(4*a_t^2*(1 - s2/(4*a_t))^(1/2)*(s2/(4*a_t))^(1/2)) - (s1*cos(2*asin((s1/(4*a_t))^(1/2))))/(4*a_t^2*(1 - s1/(4*a_t))^(1/2)*(s1/(4*a_t))^(1/2)) + (s2*cos(2*asin((s2/(4*a_t))^(1/2))))/(4*a_t^2*(1 - s2/(4*a_t))^(1/2)*(s2/(4*a_t))^(1/2))) - (3*a_t^2*(sin(2*asin((s1/(4*a_t))^(1/2))) - sin(2*asin((s2/(4*a_t))^(1/2))) - 2*asin((s1/(4*a_t))^(1/2)) + 2*asin((s2/(4*a_t))^(1/2))))/(2*u*(a_t^3/u)^(1/2));
 %F_dash=diff(F,a_t);
 %dtheta=acos((r1n^2+r2n^2-cn^2)/(2*r1n*r2n));
-sets1s2(s1,s2,u,dt,dtheta);
-at_short=fsolve(@solve_at_short,a0,options);                            % Semi major axis of the transfer orbit
-
-if imag(at_short)==0 & abs(at_short)>s1/4 & abs(at_short)>s2/4;
+sets1s2(s1,s2,u,dt,dtheta,m);
+%at_short=fsolve(@solve_at_short,a0,options)                           % Semi major axis of the transfer orbit
+at_short=solve_at_short_NR(a0)
+if at_short<0 & imag(at_short)==0;
+    at_short=-1*at_short;
+end
+if imag(at_short)<0.000000001
+    at_short=real(at_short)
+end
+if imag(at_short)==0 & abs(at_short)>s1/4 & abs(at_short)>s2/4 ;
+    
     alpha_short=2*asin(sqrt(s1/(4*at_short)));
     beta_short=2*asin(sqrt(s2/(4*at_short)));
 
@@ -62,8 +69,14 @@ end
 %LONG PATH TRANSFER ORBIT
 a0=100*r1n;
 options = optimset('Display','off');
-at_long=fsolve(@solve_at_long,a0,options);                            % Semi major axis of the transfer orbit
-if imag(at_long)==0 & at_long>s1/4 & at_long>s2/4;
+%at_long=fsolve(@solve_at_long,a0,options);   % Semi major axis of the transfer orbit
+at_long=solve_at_long_NR(a0);
+if at_long<0;
+    at_long=-1*at_long;
+%elseif imag(at_long)~=0
+ %   at_long=real(at_long);
+end
+if imag(at_long)==0 & at_long>s1/4 & at_long>s2/4 & at_long>0;
     alpha_long=2*pi-2*asin(sqrt(s1/(4*at_long)));
     beta_long=2*asin(sqrt(s2/(4*at_long)));
  

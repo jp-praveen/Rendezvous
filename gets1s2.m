@@ -4,4 +4,5 @@ global s2;
 global u;
 global dt;
 global dtheta;
-mat = [s1 s2 u dt dtheta];
+global m;
+mat = [s1 s2 u dt dtheta m];
