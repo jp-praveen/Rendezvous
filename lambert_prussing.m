@@ -1,6 +1,6 @@
 % GIVEN R1,R2,dT FIND V1,V2 USING PRUSSINGS ALGORITHM
 function [v1_short,v2_short,at_short,RAAN_short,inclination_short,perigee_short,v1_long,v2_long,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,transfer_time,dtheta,m)
-u=398588.738;                             % in km^3*s^-2 
+u=132712440018;                             % in km^3*s^-2 
 
 r1n=norm(r1);
 r2n=norm(r2);
@@ -21,12 +21,16 @@ options = optimset('Display','off');
 %dtheta=acos((r1n^2+r2n^2-cn^2)/(2*r1n*r2n));
 sets1s2(s1,s2,u,dt,dtheta,m);
 %at_short=fsolve(@solve_at_short,a0,options)                           % Semi major axis of the transfer orbit
-at_short=solve_at_short_NR(a0)
+if isnan(r1n)==0 & isnan(r2n)==0;
+    at_short=solve_at_short_NR(a0);
+else
+    at_short=nan;
+end
 if at_short<0 & imag(at_short)==0;
     at_short=-1*at_short;
 end
 if imag(at_short)<0.000000001
-    at_short=real(at_short)
+    at_short=real(at_short);
 end
 if imag(at_short)==0 & abs(at_short)>s1/4 & abs(at_short)>s2/4 ;
     
@@ -59,8 +63,8 @@ if imag(at_short)==0 & abs(at_short)>s1/4 & abs(at_short)>s2/4 ;
     v2_short_1=[vr2_short;vp2_short;0];
     v2_short=DCM_short*v2_short_1;
 else    
-    v1_short=nan;
-    v2_short=nan;
+    v1_short=[nan;nan;nan];
+    v2_short=[nan;nan;nan];
     RAAN_short=nan;
     inclination_short=nan;
     perigee_short=nan;
@@ -70,7 +74,11 @@ end
 a0=100*r1n;
 options = optimset('Display','off');
 %at_long=fsolve(@solve_at_long,a0,options);   % Semi major axis of the transfer orbit
-at_long=solve_at_long_NR(a0);
+if isnan(r1n)==0 & isnan(r2n)==0;
+    at_long=solve_at_long_NR(a0);
+else
+    at_long=nan;
+end
 if at_long<0;
     at_long=-1*at_long;
 %elseif imag(at_long)~=0
@@ -106,8 +114,8 @@ if imag(at_long)==0 & at_long>s1/4 & at_long>s2/4 & at_long>0;
     v2_long_1=[vr2_long;vp2_long;0];
     v2_long=DCM_long*v2_long_1;
 else
-    v1_long=nan;
-    v2_long=nan;
+    v1_long=[nan;nan;nan];
+    v2_long=[nan;nan;nan];
     RAAN_long=nan;
     inclination_long=nan;
     perigee_long=nan;

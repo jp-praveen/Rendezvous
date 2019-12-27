@@ -1,10 +1,11 @@
 function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
-method=3;
-u=398588.738;                             % in km^3*s^-2 
+method=2;
+u=132712440018;                             % in km^3*s^-2 
                                 
 for i=1:tn
+            
     r=debri_position_1(:,i);
     v=debri_velocity_1(:,i);
     [r1,v1,alpha,universal_anomaly]=find_r2_v2(r,v,twait,T(1,i));
@@ -24,6 +25,7 @@ t_initial(s);
 ta_chaser=ma_ta(ma_deg_chaser,e(s));
 
 for i=1:tn;
+    i
     
     if ismember(i,sequence_best)==0 & ismember(i,previous_sequence)==0;
         r2_ini=debri_position_new(i,:);
@@ -73,7 +75,9 @@ for i=1:tn;
             
             end
         end
-        for dt=100:100:2*T(i);
+        for dt=169.08;
+            dt
+            dt=dt*86400;
             k=k+1;
             ma_deg_target=(u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5)*(t_initial(1,i)+twait+dt)*180/pi;
             ta_target=ma_ta(ma_deg_target,e(1,i));
@@ -85,28 +89,75 @@ for i=1:tn;
             if method==1;
                 [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert_book(r1,r2,dt);
             elseif method==2
-                [v1_prograde,v2_prograde,at_short,RAAN_short,inclination_short,perigee_short,v1_retrograde,v2_retrograde,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,dt,dtheta);
+                for m=0:5;
+                    
+                    
+                    
+                    [v1_prograde,v2_prograde,at_short,RAAN_short,inclination_short,perigee_short,v1_retrograde,v2_retrograde,at_long,RAAN_long,inclination_long,perigee_long] = lambert_prussing(r1,r2,dt,dtheta,m);
+                    v1_prograde_m(:,m+1)=v1_prograde;
+                    v2_prograde_m(:,m+1)=v2_prograde;
+                    v1_retrograde_m(:,m+1)=v1_retrograde;
+                    v2_retrograde_m(:,m+1)=v2_retrograde;
+                end
+                for m1=1:6;
+                    dv1_pro=v1_prograde_m(:,m1)-v1;
+                    dv2_pro=v2-v2_prograde_m(:,m1);
+                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro)
+        
+                    dv1_retro=v1_retrograde_m(:,m1)-v1;
+                    dv2_retro=v2-v2_retrograde_m(:,m1);
+                    dv_retrograde_1_m(m1)=norm(dv1_retro)+norm(dv2_retro);
+                end
+                dv_prograde_1=min(dv_prograde_1_m)
+                dv_retrograde_1=min(dv_retrograde_1_m);
+                    
+                
+                    
             else
+                  
                 r1=transpose(r1);
                 r2=transpose(r2);
                 v1=transpose(v1);
                 v2=transpose(v2);
-                m=1;
-                [V1, V2, extremal_distances, exitflag] = lambert(r1, r2, dt, m, u);
+                for m=0:2;
+                    dt=dt/86400;
+                    
+                    [V1, V2, extremal_distances, exitflag] = lambert(r1, r2, dt, m, u);
+                    
+                    v1_prograde_m(:,m+1)=V1;
+                    v2_prograde_m(:,m+1)=V2;
+                    v1_retrograde_m(:,m+1)=[nan;nan;nan];
+                    v2_retrograde_m(:,m+1)=[nan;nan;nan];
+                end
+                for m1=1:3;
+                    dv1_pro=v1_prograde_m(:,m1)-v1;
+                    dv2_pro=v2-v2_prograde_m(:,m1);
+                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro)
+        
+                    dv1_retro=v1_retrograde_m(:,m1)-v1;
+                    dv2_retro=v2-v2_retrograde_m(:,m1);
+                    dv_retrograde_1_m(m1)=norm(dv1_retro)+norm(dv2_retro);
+                end
+                dv_prograde_1=min(dv_prograde_1_m)
+                dv_retrograde_1=min(dv_retrograde_1_m);
+                
+                
+                
+                
                 v1_prograde=V1;
                 v2_prograde=V2;
                 v1_retrograde=V1;
                 v2_retrograde=V2;
-                
+                dt=dt*86400;
             end
             
-            dv1_pro=v1_prograde-v1;
-            dv2_pro=v2-v2_prograde;
-            dv_prograde_1=norm(dv1_pro)+norm(dv2_pro);
+            %dv1_pro=v1_prograde-v1;
+            %dv2_pro=v2-v2_prograde;
+            %dv_prograde_1=norm(dv1_pro)+norm(dv2_pro);
         
-            dv1_retro=v1_retrograde-v1;
-            dv2_retro=v2-v2_retrograde;
-            dv_retrograde_1=norm(dv1_retro)+norm(dv2_retro); 
+            %dv1_retro=v1_retrograde-v1;
+            %dv2_retro=v2-v2_retrograde;
+            %dv_retrograde_1=norm(dv1_retro)+norm(dv2_retro); 
             
             if isnan(dv_prograde_1)==0;
                 dv(i,k)=dv_prograde_1;

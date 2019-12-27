@@ -7,7 +7,7 @@
 %             XDOT             YDOT             ZDOT    [km/s]
 %            -2.04410472        5.83405751       -4.77434023
 n=2;
-m=0;
+m=1;
 method=2;             % 1--> Howard ; 2--> Prussing ; 3--> Lancaster
 u=398588.738;                             % in km^3*s^-2 
 %dv_max=0.5;                                 % in km/sec
@@ -85,7 +85,7 @@ for i=1:n-1;
         %r1=transpose(r1);
         %v1=transpose(v1);
         
-        for dt=1000:50:2600;  %
+        for dt=500:50:20000;  %
             
             k=k+1;
             t=twait+dt;

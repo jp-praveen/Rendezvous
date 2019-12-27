@@ -12,4 +12,4 @@ end
 eccentric_anomaly=fzero(@solve_eccentricanomaly,eccentric_anomaly1);
 
 true_anomaly_rad=2*atan(sqrt((1+e)/(1-e))*tan(eccentric_anomaly/2));    
-true_anomaly=true_anomaly_rad*180/3.14;                      % ta=True Anomaly (in degrees) 
+true_anomaly=true_anomaly_rad*180/pi;                      % ta=True Anomaly (in degrees) 
