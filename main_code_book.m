@@ -6,9 +6,9 @@
 %            542.13411088    -3934.00754565    -5496.24138485 
 %             XDOT             YDOT             ZDOT    [km/s]
 %            -2.04410472        5.83405751       -4.77434023
-n=2;
+n=10;
 m=1;
-method=2;             % 1--> Howard ; 2--> Prussing ; 3--> Lancaster
+method=3;             % 1--> Howard ; 2--> Prussing ; 3--> Lancaster
 u=398588.738;                             % in km^3*s^-2 
 %dv_max=0.5;                                 % in km/sec
 re=0;
@@ -50,17 +50,17 @@ fclose(fid);
 
 % ----------------------- WATCH OUT HERE --------------------------------
 [x,y,z,xdot,ydot,zdot]=test_sgp4;
-% ------------------------ PRONE TO ERROR -------------------------------
+% ----------------------- PRONE TO ERROR -------------------------------
 for i=1:n;
     if i==1; 
-        r_chaser_1=[re+x(i,1);re+y(i,1);re+z(i,1)]                % Initial position of chaser
+        r_chaser_1=[re+x(i,1);re+y(i,1);re+z(i,1)];                % Initial position of chaser
         v_chaser_1=[xdot(i,1);ydot(i,1);zdot(i,1)];       % Velocity of chaser at initial position
         h(1,i)=sqrt(a(1,i)*u*(1-e(1,i)^2));               % Specific angluar momentum
         T(1,i)=((u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5))^(-1)*(2*pi);              % Time Period   
         true_anomaly(1,i)=ma_ta(mean_anomaly(1,i),e(1,i));
         t_initial_chaser=(mean_anomaly(1,i)*T(1,i))/(2*pi);
     else
-        debri_position_1(:,i-1)=[re+x(i,1);re+y(i,1);re+z(i,1)]          % Initial position of debris; nth column implies nth debri data
+        debri_position_1(:,i-1)=[re+x(i,1);re+y(i,1);re+z(i,1)];          % Initial position of debris; nth column implies nth debri data
         debri_velocity_1(:,i-1)=[xdot(i,1);ydot(i,1);zdot(i,1)]; % Initial velocity of debris; nth column implies nth debri data
         h(1,i)=sqrt(a(1,i)*u*(1-e(1,i)^2));                      % specific angluar momentum   
         T(1,i)=((u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5))^(-1)*(2*pi);                  % Time Period
@@ -68,24 +68,26 @@ for i=1:n;
         true_anomaly(1,i)=ma_ta(mean_anomaly(1,i),e(1,i));
     end  
 end
-
-for i=1:n-1;
-    i;
+j=0;
+for twait=50000:1:150000;
+    twait
+    i=1;
     T(i+1);
-    j=0;
     
-    for twait=139968;                                   % Waiting Time
-        j=j+1;
+    j=j+1;
+    %twait=twait+5;
+    for twait=twait;                                   % Waiting Time
+        
         r1_ini=r_chaser_1;
         v1_ini=v_chaser_1;
         [r1,v1,alpha,universal_anomaly_chaser]=find_r2_v2(r1_ini,v1_ini,twait,T(1));
         ma_deg_chaser=(u^2/h(1,1)^3)*(1-e(1,1)^2)^(1.5)*(t_initial_chaser+twait)*180/pi;
         ta_chaser=ma_ta(ma_deg_chaser,e(1,1));
         k=0;
-        %r1=transpose(r1);
-        %v1=transpose(v1);
+        r1=transpose(r1);
+        v1=transpose(v1);
         
-        for dt=500:50:20000;  %
+        for dt=500:50:10000;  %
             
             k=k+1;
             t=twait+dt;
@@ -95,10 +97,10 @@ for i=1:n-1;
             check_r2(i,k)=norm(r2);
             check_ua_target(i,k)=universal_anomaly_target;
             if isnan(r2)==0 ;
-                dt             
+                dt;             
                 ma_deg_target=(u^2/h(1,i+1)^3)*(1-e(1,i+1)^2)^(1.5)*(t_initial(1,i)+t)*180/pi;
                 ta_target=ma_ta(ma_deg_target,e(1,i+1));
-                dtheta=-1*(ta_chaser-ta_target)
+                dtheta=-1*(ta_chaser-ta_target);
                 %if dtheta<0;
                  %   dtheta=360+dtheta
                 %end
@@ -132,28 +134,43 @@ for i=1:n-1;
                 %if dv_prograde_1<dv_max || dv_retrograde_1<dv_max;
                 
                     if isnan(dv_prograde_1)==0;
-                        dv(i,k)=dv_prograde_1;
+                        dv(j,k)=dv_prograde_1;
                     elseif isnan(dv_retrograde_1)==0; 
-                        dv(i,k)=dv_retrograde_1;
+                        dv(j,k)=dv_retrograde_1;
                     else
-                        dv(i,k)=nan;
+                        dv(j,k)=nan;
                     end
                     %a_short(i,k)=at_short;
                     %a_long(i,k)=at_long;
-                    tmin(i,k)=t;
-                    tcoast(i,k)=twait;
-                    transfer_time(i,k)=dt;
-                    ta_debri(i,k)=ta_target;
-                    ma_debri(i,k)=ma_deg_target;
+                    
+                    if isnan(dv(j,k));
+                        tmin(j,k)=nan;
+                        tcoast(j,k)=nan;
+                        transfer_time(j,k)=nan;
+                        ta_debri(j,k)=nan;
+                        ma_debri(j,k)=nan;
+                    else
+                        tmin(j,k)=t;
+                        tcoast(j,k)=twait;
+                        transfer_time(j,k)=dt;
+                        ta_debri(j,k)=ta_target;
+                        ma_debri(j,k)=ma_deg_target;
+                    end
+                        
                     %delta_theta(i,k)=dtheta;
                     %ma_debri(1,i)=ma_deg;
                     %break;
                 %end
             else
+                dv(j,k)=nan;
+                tmin(j,k)=nan;
+                tcoast(j,k)=nan;
+                transfer_time(j,k)=nan;
                 %dt
             end
         end
     end
+    
 end
         
         
@@ -165,27 +182,50 @@ end
         %transfer_time(transfer_time==0)=[];
     %end
 %end
-for i=1:n-1;
+n1=size(dv);
+x=[];
+y=[];
+z=[];
+for i=1:n1(1);
     dv_plot=dv(i,:);
+    dv_plot=dv_plot(~isnan(dv_plot));
     dt=transfer_time(i,:);
+    dt=dt(~isnan(dt));
     coasting_time=tcoast(i,:);
+    coasting_time=coasting_time(~isnan(coasting_time));
     coasting_time(coasting_time==0)=nan;
     dt(dt==0)=nan;
-    figure(i);
-    plot(dt,dv_plot);
-    grid
-    title('Tranfer time Vs dv');
-    xlabel('Transfer time (in seconds)');
-    ylabel('dv (in km/s)');  
+    x=padconcatenation(x,dt,2);
+    y=padconcatenation(y,coasting_time,2);
+    z=padconcatenation(z,dv_plot,2); 
+    %plot3(x,y,z,'.');
+    %figure(i);
+    %plot(dt,dv_plot);  
     dt=[];
     coasting_time=[];
+    dv_plot=[];
+end
+v_x=linspace(min(x),max(x),100);
+v_y=linspace(min(y),max(y),100);
+[xx,yy]=meshgrid(v_x,v_y);
+zz=griddata(x,y,z,xx,yy);
+mesh(xx,yy,zz)
+shading flat;
+hold on
+title('Tranfer time Vs Coasting time Vs dv');
+xlabel('Transfer time (in seconds)');
+ylabel('Coasting time (in seconds)');
+zlabel('dv (in km/s)');
+
+for i=1:n1(1);
+    temp=dv(i,:);
+    mindv(i)=min(temp(temp>0));
+    if mindv(i)==[]
+        mindv(i)=nan;
+    end
 end
 
-%for i=1:n-1;
- %   temp=dv(i,:);
-  %  mindv(i)=min(temp(temp>0));
-%end
-
+mindv
 
 %for i=1:n-1;
  %   if mindv(i)<1.2;

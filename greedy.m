@@ -109,19 +109,27 @@ for i=1:tn;
     t_initial(1,i)=mean_anomaly(1,i)*T(1,i)/(2*pi);
 end
 mean_anomaly=mean_anomaly*180/pi;   
-twait=2033.48*86400;
-while dv<dvmax & length(sequence_best)<tn;
-    %twait
-    dvmax_available=dvmax-dv;
-    [time_elapsed,dv_current,next_node] = realistic_position(tn,s,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e);
-    %time_elapsed
-    if dv+dv_current<dvmax;
-        s=next_node;
-        twait=twait+time_elapsed;
-        dv=dv+dv_current;
-        sequence_best=[sequence_best s]
-    else
-        break;
+for twait=2026.5;
+    twait
+    twait=twait*86400;
+    dv=0;
+    dv_current=0;
+    s=startnode;
+    sequence_best=[s];
+    
+    while dv<dvmax & length(sequence_best)<tn
+        %twait
+        dvmax_available=dvmax-dv;
+        [time_elapsed,dv_current,next_node] = realistic_position(tn,s,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e);
+        %time_elapsed
+        if dv+dv_current<dvmax;
+            s=next_node;
+            twait=twait+time_elapsed;
+            dv=dv+dv_current
+            sequence_best=[sequence_best s]
+        else
+            break;
+        end
     end
 end
 time_elapsed=twait;

@@ -1,7 +1,7 @@
 function [time_elapsed,dv,next_node] = realistic_position(totalnode,startnode,twait,sequence_best,previous_sequence,dvmax,dvmax_available,approach,debri_position_1,debri_velocity_1,h,T,t_initial,true_anomaly,e)        
 tn=totalnode;
 s=startnode;
-method=2;
+method=3;
 u=132712440018;                             % in km^3*s^-2 
                                 
 for i=1:tn
@@ -25,7 +25,7 @@ t_initial(s);
 ta_chaser=ma_ta(ma_deg_chaser,e(s));
 
 for i=1:tn;
-    i
+    %i
     
     if ismember(i,sequence_best)==0 & ismember(i,previous_sequence)==0;
         r2_ini=debri_position_new(i,:);
@@ -75,8 +75,10 @@ for i=1:tn;
             
             end
         end
-        for dt=169.08;
-            dt
+        r1=transpose(r1);
+        v1=transpose(v1);
+        for dt=50:1:180;
+            %dt
             dt=dt*86400;
             k=k+1;
             ma_deg_target=(u^2/h(1,i)^3)*(1-e(1,i)^2)^(1.5)*(t_initial(1,i)+twait+dt)*180/pi;
@@ -89,7 +91,7 @@ for i=1:tn;
             if method==1;
                 [v1_prograde,v2_prograde,RAAN_prograde,inclination_prograde,perigee_prograde,true_anomaly_1_prograde,true_anomaly_2_prograde,v1_retrograde,v2_retrograde,RAAN_retrograde,inclination_retrograde,perigee_retrograde,true_anomaly_1_retrograde,true_anomaly_2_retrograde] = lambert_book(r1,r2,dt);
             elseif method==2
-                for m=0:5;
+                for m=0:2;
                     
                     
                     
@@ -99,10 +101,10 @@ for i=1:tn;
                     v1_retrograde_m(:,m+1)=v1_retrograde;
                     v2_retrograde_m(:,m+1)=v2_retrograde;
                 end
-                for m1=1:6;
+                for m1=1:3;
                     dv1_pro=v1_prograde_m(:,m1)-v1;
                     dv2_pro=v2-v2_prograde_m(:,m1);
-                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro)
+                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro);
         
                     dv1_retro=v1_retrograde_m(:,m1)-v1;
                     dv2_retro=v2-v2_retrograde_m(:,m1);
@@ -115,30 +117,30 @@ for i=1:tn;
                     
             else
                   
-                r1=transpose(r1);
+                
                 r2=transpose(r2);
-                v1=transpose(v1);
+                
                 v2=transpose(v2);
                 for m=0:2;
                     dt=dt/86400;
-                    
+                                                            
                     [V1, V2, extremal_distances, exitflag] = lambert(r1, r2, dt, m, u);
                     
-                    v1_prograde_m(:,m+1)=V1;
-                    v2_prograde_m(:,m+1)=V2;
-                    v1_retrograde_m(:,m+1)=[nan;nan;nan];
-                    v2_retrograde_m(:,m+1)=[nan;nan;nan];
+                    v1_prograde_m(m+1,:)=V1;
+                    v2_prograde_m(m+1,:)=V2;
+                    v1_retrograde_m(m+1,:)=[nan,nan,nan];
+                    v2_retrograde_m(m+1,:)=[nan,nan,nan];
                 end
                 for m1=1:3;
-                    dv1_pro=v1_prograde_m(:,m1)-v1;
-                    dv2_pro=v2-v2_prograde_m(:,m1);
-                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro)
+                    dv1_pro=v1_prograde_m(m1,:)-v1;
+                    dv2_pro=v2-v2_prograde_m(m1,:);
+                    dv_prograde_1_m(m1)=norm(dv1_pro)+norm(dv2_pro);
         
-                    dv1_retro=v1_retrograde_m(:,m1)-v1;
-                    dv2_retro=v2-v2_retrograde_m(:,m1);
+                    dv1_retro=v1_retrograde_m(m1,:)-v1;
+                    dv2_retro=v2-v2_retrograde_m(m1,:);
                     dv_retrograde_1_m(m1)=norm(dv1_retro)+norm(dv2_retro);
                 end
-                dv_prograde_1=min(dv_prograde_1_m)
+                dv_prograde_1=min(dv_prograde_1_m);
                 dv_retrograde_1=min(dv_retrograde_1_m);
                 
                 
